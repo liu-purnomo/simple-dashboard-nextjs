@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.80.7",
     "google-sheet-crud": "^1.10.4",
     "next": "15.3.3",
     "react": "^19.0.0",
