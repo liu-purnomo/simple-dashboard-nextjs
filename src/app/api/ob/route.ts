@@ -2,7 +2,7 @@ import { Sheet, SHEET_RANGE } from '@/lib/sheet';
 
 export async function GET() {
   try {
-    const dataFromSheet = await Sheet.read(SHEET_RANGE.productionOb);
+    const dataFromSheet = await Sheet.read(SHEET_RANGE.ds);
 
     if (!dataFromSheet || dataFromSheet.length === 0) {
       return Response.json(
