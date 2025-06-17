@@ -1,0 +1,56 @@
+.mantine-Paper-root {
+  @apply bg-transparent;
+}
+
+.mantine-a5v3r0 {
+  @apply bg-transparent;
+}
+
+.mantine-1knjhw7 {
+  @apply border-b;
+}
+
+.mantine-Checkbox-input {
+  cursor: pointer;
+}
+
+.mantine-Checkbox-body {
+  background-color: white;
+  /* border: gray 0.5px solid; */
+  border: rgb(224 230 237) 2px solid;
+  border-radius: 0.25rem;
+  margin-right: 0px;
+  padding-right: 0px;
+}
+
+.mantine-yxmaw9 {
+  max-width: 400px;
+}
+
+.mantine-1hz932c {
+  @apply me-1 pr-1 pe-1;
+}
+
+.mantine-iz2iwx {
+  @apply me-1 pr-1 pe-1;
+}
+
+.mantine-yxmaw9 {
+  @apply me-1 pr-1 pe-1;
+}
+
+.mantine-Checkbox-root {
+  @apply me-1 pr-1 pe-1;
+}
+
+td.mantine-iz2iwx {
+  @apply me-0 pe-0 w-2;
+}
+
+.mantine-1hz932c {
+  @apply p-0 m-0;
+}
+
+.mantine-1mo4y8r {
+  @apply hidden;
+}

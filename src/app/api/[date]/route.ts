@@ -1,13 +1,39 @@
 import { Sheet, SHEET_RANGE } from '@/lib/sheet';
 import { NextRequest } from 'next/server';
 
+const isValidDateInput = (dateStr: string): boolean => {
+  const regex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!regex.test(dateStr)) return false;
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(dateStr);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() + 1 === month &&
+    date.getDate() === day
+  );
+};
+
 export async function GET(
   req: NextRequest,
-  context: { params?: Record<string, string> }
+  { params }: { params: { date: string } },
 ) {
   try {
-    const date = context.params?.date;
+    const date = params.date;
+
+    if (!isValidDateInput(date)) {
+      return Response.json(
+        {
+          success: false,
+          error: 'Invalid date format. Please use a valid YYYY-MM-DD format.',
+        },
+        { status: 400 },
+      );
+    }
+
     const targetDate = new Date(date!).toDateString();
+
     const [production, fuel, dispatchNs, dispatchDs, plant] = await Promise.all(
       [
         Sheet.read(SHEET_RANGE.productionOb),
@@ -15,7 +41,7 @@ export async function GET(
         Sheet.read(SHEET_RANGE.ds),
         Sheet.read(SHEET_RANGE.ns),
         Sheet.read(SHEET_RANGE.plant),
-      ]
+      ],
     );
 
     const normalizeDate = (val: string) => new Date(val).toDateString();
@@ -42,7 +68,7 @@ export async function GET(
         success: false,
         error: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
