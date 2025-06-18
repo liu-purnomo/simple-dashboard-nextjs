@@ -40,4 +40,6 @@ export const SHEET_RANGE = {
   ns: 'NS!A1:J',
   fuel: 'FUEL!A1:F',
   plant: 'PLANT!A1:G',
+  user: 'USER!A1:C',
+  errorLog: 'ERROR!A1:D',
 };

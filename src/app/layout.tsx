@@ -6,8 +6,8 @@ import '../assets/styles/tailwind.css';
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | MMS',
-    default: 'Drone Indonesia',
+    template: '%s | ADT',
+    default: 'Dashboard ADT',
   },
 };
 
