@@ -141,7 +141,6 @@ export async function GET(req: NextRequest) {
       getDailySummary(date, { production, fuel, dispatchNs, dispatchDs }),
     );
 
-    // 🔥 Compute summary
     const totalFuel = data.reduce(
       (acc, curr) => acc + (curr.fuel?.daily || 0),
       0,
