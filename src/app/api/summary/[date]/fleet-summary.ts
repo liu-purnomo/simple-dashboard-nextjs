@@ -49,8 +49,10 @@ export function summarizeDispatchFleet(
       current.material.push(item.material);
     }
 
-    if (item.dump && !current.dumping.includes(item.dump)) {
-      current.dumping.push(item.dump);
+    const wasteDump = `${item.dump} ${item.distance}m`;
+
+    if (wasteDump && !current.dumping.includes(wasteDump)) {
+      current.dumping.push(wasteDump);
     }
 
     const trip = parseInt(item.trip.replace(/,/g, ''));
