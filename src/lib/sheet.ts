@@ -38,7 +38,7 @@ export const SHEET_RANGE = {
   productionOb: 'OB!A1:L',
   ds: 'DS!A1:J',
   ns: 'NS!A1:J',
-  fuel: 'FUEL!A1:F',
+  fuel: 'FUEL!A1:G',
   plant: 'PLANT!A1:G',
   user: 'USER!A1:C',
   errorLog: 'ERROR!A1:D',

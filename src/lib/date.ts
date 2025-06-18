@@ -1,3 +1,5 @@
+import { format, isValid, parse } from 'date-fns';
+
 export class DateFormat {
   /**
    * Format date into yyyy-mm-dd format
@@ -240,4 +242,23 @@ export class DateFormat {
 
     return formattedDate;
   }
+
+  static normalizeDate = (val: string): string => {
+    const formats = [
+      'yyyy-MM-dd',
+      'MM/dd/yyyy',
+      'd/M/yyyy',
+      'M/d/yyyy',
+      'dd/MM/yyyy',
+    ];
+
+    for (const fmt of formats) {
+      const parsed = parse(val, fmt, new Date());
+      if (isValid(parsed)) {
+        return format(parsed, 'EEE MMM dd yyyy');
+      }
+    }
+
+    return '';
+  };
 }

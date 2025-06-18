@@ -10,18 +10,14 @@ export async function GET(
   try {
     const date = params.date;
 
-    const targetDate = Normalize.date(date); // example: 'Mon Jun 16 2025'
     const sheetFormattedDate = Normalize.dateToSheet(date); // example: '16/06/2025'
 
-    const [production, fuel, dispatchNs, dispatchDs, plant] = await Promise.all(
-      [
-        Sheet.read(SHEET_RANGE.productionOb),
-        Sheet.read(SHEET_RANGE.fuel),
-        Sheet.read(SHEET_RANGE.ns),
-        Sheet.read(SHEET_RANGE.ds),
-        Sheet.read(SHEET_RANGE.plant),
-      ],
-    );
+    const [production, fuel, dispatchNs, dispatchDs] = await Promise.all([
+      Sheet.read(SHEET_RANGE.productionOb),
+      Sheet.read(SHEET_RANGE.fuel),
+      Sheet.read(SHEET_RANGE.ns),
+      Sheet.read(SHEET_RANGE.ds),
+    ]);
 
     const toSafeDateString = (raw: any) => {
       const match = raw?.toString().match(/\d{2}\/\d{2}\/\d{4}/);
@@ -35,21 +31,25 @@ export async function GET(
     const selectedFuel = filterByDate(fuel);
     const selectedDispatchNs = filterByDate(dispatchNs);
     const selectedDispatchDs = filterByDate(dispatchDs);
-    const selectedPlant = filterByDate(plant);
 
-    const allFleet = selectedDispatchDs
+    const allFleetDs = selectedDispatchDs
       .map((item) => item.fleet?.trim())
       .filter(Boolean);
-    const uniqueFleets = Array.from(new Set(allFleet));
+    const uniqueFleetDs = Array.from(new Set(allFleetDs));
 
     const fleetSummaryDs = summarizeDispatchFleet(
       selectedDispatchDs,
-      uniqueFleets,
+      uniqueFleetDs,
     );
+
+    const allFleetNs = selectedDispatchNs
+      .map((item) => item.fleet?.trim())
+      .filter(Boolean);
+    const uniqueFleetNs = Array.from(new Set(allFleetNs));
 
     const fleetSummaryNs = summarizeDispatchFleet(
       selectedDispatchNs,
-      uniqueFleets,
+      uniqueFleetNs,
     );
 
     const dataFuel = {
@@ -87,13 +87,13 @@ export async function GET(
         fuel: dataFuel,
         fuelRatio,
         ds: {
-          fleet: fleetSummaryDs,
+          fleet: Object.values(fleetSummaryDs),
           actual: actDs,
           fuel: dataFuel.ds,
           fuelRatio: fuelRatioDs,
         },
         ns: {
-          fleet: fleetSummaryNs,
+          fleet: Object.values(fleetSummaryNs),
           actual: actNs,
           fuel: dataFuel.ns,
           fuelRatio: fuelRatioNs,
