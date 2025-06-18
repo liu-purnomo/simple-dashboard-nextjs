@@ -228,9 +228,9 @@ export const DailySummaryPage: FC<{
                   <thead>
                     <tr>
                       <th>Fleet</th>
-                      <th>Unit</th>
-                      <th>Ritase</th>
-                      <th>Dumping</th>
+                      <th>DT</th>
+                      <th>Trip</th>
+                      <th>Waste Dump (Distance)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -252,8 +252,17 @@ export const DailySummaryPage: FC<{
                             </td>
                             <td>{fleet.dt.length}</td>
                             <td>{fleet.trip}</td>
-                            <td className="whitespace-nowrap">
-                              {fleet.dumping.join(', ')}
+                            <td className="flex flex-col">
+                              {fleet.dumping.map((dump: string) => {
+                                return (
+                                  <div
+                                    key={dump}
+                                    className="whitespace-nowrap "
+                                  >
+                                    <span>- {dump}</span>
+                                  </div>
+                                );
+                              })}
                             </td>
                           </tr>
                         );
@@ -274,9 +283,9 @@ export const DailySummaryPage: FC<{
                   <thead>
                     <tr>
                       <th>Fleet</th>
-                      <th>Unit</th>
-                      <th>Ritase</th>
-                      <th>Dumping</th>
+                      <th>DT</th>
+                      <th>Trip</th>
+                      <th>Waste Dump (Distance)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -298,8 +307,17 @@ export const DailySummaryPage: FC<{
                             </td>
                             <td>{fleet.dt.length}</td>
                             <td>{fleet.trip}</td>
-                            <td className="whitespace-nowrap">
-                              {fleet.dumping.join(', ')}
+                            <td className="flex flex-col">
+                              {fleet.dumping.map((dump: string) => {
+                                return (
+                                  <div
+                                    key={dump}
+                                    className="whitespace-nowrap "
+                                  >
+                                    <span>- {dump}</span>
+                                  </div>
+                                );
+                              })}
                             </td>
                           </tr>
                         );

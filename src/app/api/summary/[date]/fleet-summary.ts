@@ -49,7 +49,7 @@ export function summarizeDispatchFleet(
       current.material.push(item.material);
     }
 
-    const wasteDump = `${item.dump} ${item.distance}m`;
+    const wasteDump = `${item.dump} (${item.distance}m)`;
 
     if (wasteDump && !current.dumping.includes(wasteDump)) {
       current.dumping.push(wasteDump);
