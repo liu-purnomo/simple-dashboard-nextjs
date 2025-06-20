@@ -1,249 +1,98 @@
 import { format, isValid, parse } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 export class DateFormat {
-  /**
-   * Format date into yyyy-mm-dd format
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in yyyy-mm-dd format
-   * @example
-   * DateFormat.Ymd(new Date()) // Output: "2024/12/03"
-   */
-  static Ymd(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
+  // ========== BASIC FORMATTING ==========
 
-    const [day, month, year] = formattedDate.split('/');
-
-    return `${year}-${month}-${day}`;
+  /** Format: yyyy-MM-dd */
+  static toISO(input: Date | string = new Date()): string {
+    return format(new Date(input), 'yyyy-MM-dd');
   }
 
-  /**
-   * Format date into dd/MM/yyyy format
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in dd/MM/yyyy format
-   * @example
-   * DateFormat.dmY(new Date()) // Output: "13/03/2024"
-   */
-  static dmY(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-
-    return formattedDate;
+  /** Format: dd/MM/yyyy */
+  static toSheet(input: Date | string = new Date()): string {
+    return format(new Date(input), 'dd/MM/yyyy');
   }
 
-  /**
-   * Format date into dd month yyyy format (example: 13 March 2024)
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in dd month yyyy format
-   * @example
-   * DateFormat.dMY(new Date()) // Output: "13 March 2024"
-   */
-  static dMY(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    });
-
-    return formattedDate;
+  /** Format: dd MMMM yyyy (e.g. 13 Maret 2024) */
+  static toLong(input: Date | string = new Date()): string {
+    return format(new Date(input), 'dd MMMM yyyy', { locale: id });
   }
 
-  static my(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      month: 'short',
-      year: 'numeric',
-    });
-
-    return formattedDate;
+  /** Format: dd-MMM-yyyy (e.g. 24-Mei-2025) */
+  static toShortDash(input: Date | string = new Date()): string {
+    return format(new Date(input), 'dd-MMM-yyyy', { locale: id });
   }
 
-  /**
-   * Format date into dd-mm-yyyy, hh:mm:ss format
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in dd-mm-yyyy, hh:mm:ss format
-   * @example
-   * DateFormat.dmyhms(new Date()) // Output: "13-03-2024, 23:59:59"
-   */
-
-  static dmYhms(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-
-    return formattedDate;
+  /** Format: MMM yyyy (e.g. Mei 2024) */
+  static toMonthYear(input: Date | string = new Date()): string {
+    return format(new Date(input), 'MMM yyyy', { locale: id });
   }
 
-  /**
-   * Get Year, Month and Day from date
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns object with year, month and day
-   * @example
-   * DateFormat.getYearMonthDay(new Date()) // Output: { year: 2024, month: 3, day: 13 }
-   */
+  /** Format: dd-MM-yyyy, HH:mm:ss */
+  static toFull(input: Date | string = new Date()): string {
+    const parsed =
+      typeof input === 'string'
+        ? parse(input, 'dd/MM/yyyy', new Date())
+        : new Date(input);
 
-  static getYearMonthDay(input: any = new Date()): {
-    year: number;
-    month: number;
-    day: number;
-  } {
-    const date = new Date(input);
-    const year = Number(
-      date.toLocaleString('id-ID', {
-        year: 'numeric',
-      }),
-    );
-    const month = Number(
-      date.toLocaleString('id-ID', {
-        month: 'numeric',
-      }),
-    );
-    const day = Number(
-      date.toLocaleString('id-ID', {
-        day: 'numeric',
-      }),
-    );
-    return { year, month, day };
+    return isValid(parsed) ? format(parsed, 'dd-MM-yyyy, HH:mm:ss') : '';
   }
 
-  /**
-   * Get the range of the current week (Monday to Sunday)
-   * @returns Object with start and end dates of the week
-   * @example
-   * DateFormat.thisWeekRange()
-   * // Output: { start: Mon, 13 Mar 2024 00:00:00 GMT+0700, end: Sun, 19 Mar 2024 23:59:59 GMT+0700 }
-   */
-  static thisWeekRange(): { start: Date; end: Date } {
+  /** Format: dd/MM/yyyy HH:mm:ss */
+  static timestamp(input: Date | string = new Date()): string {
+    return format(new Date(input), 'dd/MM/yyyy HH:mm:ss');
+  }
+
+  // ========== DATE STRUCTURE ==========
+
+  static getYMD(input: Date | string = new Date()) {
+    const date = new Date(input);
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+    };
+  }
+
+  // ========== RANGE ==========
+
+  static thisWeek(): { start: Date; end: Date } {
     const now = new Date();
+    const day = now.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
 
-    // Get the current day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
-    const currentDay = now.getDay();
+    const start = new Date(now);
+    start.setDate(now.getDate() + diff);
+    start.setHours(0, 0, 0, 0);
 
-    // Calculate the difference to get back to Monday (adjusting for Sunday being 0)
-    const daysToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
 
-    // Start of the week (Monday at 00:00:00)
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() + daysToMonday);
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    // End of the week (Sunday at 23:59:59)
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    return { start: startOfWeek, end: endOfWeek };
+    return { start, end };
   }
 
-  /**
-   * Get the range of the current month
-   * @returns Object with start and end dates of the month
-   * @example
-   * DateFormat.thisMonthRange()
-   * // Output: { start: Tue, 01 Mar 2024 00:00:00 GMT+0700, end: Sun, 31 Mar 2024 23:59:59 GMT+0700 }
-   */
-  static thisMonthRange(): { start: Date; end: Date } {
+  static thisMonth(): { start: Date; end: Date } {
     const now = new Date();
-
-    // Start of the month (1st day at 00:00:00)
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // End of the month (last day at 23:59:59)
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    endOfMonth.setHours(23, 59, 59, 999);
-
-    return { start: startOfMonth, end: endOfMonth };
+    const start = new Date(now.getFullYear(), now.getMonth(), 1);
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
   }
 
-  /**
-   * Get the range of the current year
-   * @returns Object with start and end dates of the year
-   * @example
-   * DateFormat.thisYearRange()
-   * // Output: { start: Mon, 01 Jan 2024 00:00:00 GMT+0700, end: Tue, 31 Dec 2024 23:59:59 GMT+0700 }
-   */
-  static thisYearRange(): { start: Date; end: Date } {
+  static thisYear(): { start: Date; end: Date } {
     const now = new Date();
-
-    // Start of the year (January 1st at 00:00:00)
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-
-    // End of the year (December 31st at 23:59:59)
-    const endOfYear = new Date(now.getFullYear(), 11, 31);
-    endOfYear.setHours(23, 59, 59, 999);
-
-    return { start: startOfYear, end: endOfYear };
+    const start = new Date(now.getFullYear(), 0, 1);
+    const end = new Date(now.getFullYear(), 11, 31);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
   }
 
-  /**
-   * convert from 11/2024 to November 2024
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in Month yyyy format
-   *
-   * @example
-   * DateFormat.monthName(new Date()) // Output: "November 2024"
-   */
+  // ========== PARSING ==========
 
-  static monthYear(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      month: 'short',
-      year: 'numeric',
-    });
-
-    return formattedDate;
-  }
-
-  /**
-   * convert from date to day-month-year format like 12-Jan-2024 or 24-Mei-2025
-   * @param input Date to be formatted (can be Date object or date string)
-   * @returns Date in dd-mm-yyyy format
-   *
-   * @example
-   * DateFormat.dayMonthYear(new Date()) // Output: "12-Jan-2024"
-   */
-
-  static dayMonthYear(input: any = new Date()): string {
-    const date = new Date(input);
-    const formattedDate = date.toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-
-    //replace all space with -
-    const output = formattedDate.replace(/\s/g, '-');
-
-    return output;
-  }
-
-  static timeStamp(input: any = new Date()): string {
-    const date = new Date(input);
-    const { day, month, year } = this.getYearMonthDay(date);
-
-    const hour = date.toLocaleTimeString();
-
-    const formattedDate = `${day}/${month}/${year} ${hour}`;
-
-    return formattedDate;
-  }
-
-  static normalizeDate = (val: string): string => {
+  /** Parse common formats and return human-readable string */
+  static normalize(input: string): string {
     const formats = [
       'yyyy-MM-dd',
       'MM/dd/yyyy',
@@ -253,12 +102,36 @@ export class DateFormat {
     ];
 
     for (const fmt of formats) {
-      const parsed = parse(val, fmt, new Date());
-      if (isValid(parsed)) {
-        return format(parsed, 'EEE MMM dd yyyy');
-      }
+      const parsed = parse(input, fmt, new Date());
+      if (isValid(parsed))
+        return format(parsed, 'EEE, dd MMM yyyy', { locale: id });
     }
 
     return '';
-  };
+  }
+
+  /** Convert dd/MM/yyyy to timestamp (for sorting) */
+  static timestampFromSheet(val: string): number {
+    const parsed = parse(val, 'dd/MM/yyyy', new Date());
+    return isValid(parsed) ? parsed.getTime() : 0;
+  }
+
+  /**
+   * Convert from MM-yyyy (e.g. "06-2025") to "Juni 2025"
+   */
+  static monthNameFromPeriod(period: string): string {
+    const parsed = parse(period, 'MM-yyyy', new Date());
+    return isValid(parsed) ? format(parsed, 'MMMM yyyy', { locale: id }) : '';
+  }
+
+  static toIndonesianFullDate(input: Date | string = new Date()): string {
+    const parsed =
+      typeof input === 'string'
+        ? parse(input, 'dd/MM/yyyy', new Date())
+        : new Date(input);
+
+    return isValid(parsed)
+      ? format(parsed, 'EEEE, dd MMMM yyyy', { locale: id })
+      : '';
+  }
 }

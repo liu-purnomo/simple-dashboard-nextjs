@@ -35,9 +35,9 @@ export class Sheet {
 }
 
 export const SHEET_RANGE = {
-  productionOb: 'OB!A1:L',
-  ds: 'DS!A1:J',
-  ns: 'NS!A1:J',
+  summary: 'SUMMARY!A1:T',
+  fleetDs: 'FLEETDS!A1:F',
+  fleetNs: 'FLEETNS!A1:F',
   fuel: 'FUEL!A1:G',
   plant: 'PLANT!A1:G',
   user: 'USER!A1:C',
