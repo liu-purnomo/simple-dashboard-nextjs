@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         await Sheet.create(SHEET_RANGE.errorLog, {
           user: user.name,
           email: user.email,
-          timestamp: DateFormat.timeStamp(new Date()),
+          timestamp: DateFormat.timestamp(new Date()),
         });
 
         return false;

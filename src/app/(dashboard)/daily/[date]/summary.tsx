@@ -2,7 +2,6 @@
 
 import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { fetchAPI } from '@/lib/fetcher';
-import { Normalize } from '@/lib/normalize';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
@@ -20,7 +19,7 @@ export const DailySummaryPage: FC<{
         <SkeletonLoading />
       ) : (
         <div className="w-full">
-          <div className="my-5 max-w-xl mx-auto gap-2 space-y-6">
+          {/* <div className="my-5 max-w-xl mx-auto gap-2 space-y-6">
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
               <div className="font-bold text-xl">SUMMARY</div>
               <div className="font-bold text-xl">PT ARTA DAYA TARUNA</div>
@@ -309,7 +308,7 @@ export const DailySummaryPage: FC<{
                 </table>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>

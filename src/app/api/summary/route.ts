@@ -36,38 +36,17 @@ export async function GET(req: NextRequest) {
       period = `${mm}-${yyyy}`;
     }
 
-    const [summaryRaw, dayShiftRaw, nightShiftRaw] = await Promise.all([
-      Sheet.read(SHEET_RANGE.summary),
-      Sheet.read(SHEET_RANGE.fleetDs),
-      Sheet.read(SHEET_RANGE.fleetNs),
-    ]);
+    const summaryRaw = await Sheet.read(SHEET_RANGE.summary);
 
     const summary = filterByPeriod(summaryRaw as SummaryRow[], period).filter(
       (s) => NumberFormat.parse(s.actDaily) > 0,
     );
-    const dayShift = filterByPeriod(dayShiftRaw as FleetRow[], period);
-    const nightShift = filterByPeriod(nightShiftRaw as FleetRow[], period);
-
-    const uniqueDates = Array.from(
-      new Set([...summary, ...dayShift, ...nightShift].map((r) => r.date)),
-    ).sort(
-      (a, b) =>
-        DateFormat.timestampFromSheet(b ?? '') -
-        DateFormat.timestampFromSheet(a ?? ''),
-    );
-
-    const combined = uniqueDates.map((date) => ({
-      date,
-      summary: summary.find((s) => s.date === date) || null,
-      dayShift: dayShift.filter((d) => d.date === date),
-      nightShift: nightShift.filter((n) => n.date === date),
-    }));
 
     return Response.json({
       success: true,
       data: {
         month: DateFormat.monthNameFromPeriod(period),
-        items: combined,
+        items: summary,
       },
     });
   } catch (error) {

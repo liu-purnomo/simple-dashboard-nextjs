@@ -19,20 +19,43 @@ interface SummaryRow {
   frNs?: string;
   frDaily?: string;
   frMtd?: string;
+  fleetDs?: string;
+  dtDs?: string;
+  fleetNs?: string;
+  dtNs?: string;
 }
 
 interface FleetRow {
-  date: string;
-  fleet: string;
-  dt: string;
-  ritase: string;
-  distance: string;
-  wasteDump: string;
+  date?: string;
+  period?: string;
+  fleet?: string;
+  unit?: string;
+  activity?: string;
+  material?: string;
+  trip?: string;
+  load?: string;
+  dump?: string;
+  distance?: string;
 }
 
-interface CombinedRow {
+type Shift = 'DS' | 'NS';
+
+interface TripSummary {
+  shift: Shift;
+  dt: number;
+  trip: number;
+  distance: number;
+  wasteDump: string;
+  units: string[];
+}
+
+interface FleetSummary {
+  fleet: string;
+  trip: TripSummary[];
+}
+
+interface DailySummary {
   date: string;
-  summary: SummaryRow | null;
-  dayShift: FleetRow[];
-  nightShift: FleetRow[];
+  dayShift: FleetSummary[];
+  nightShift: FleetSummary[];
 }

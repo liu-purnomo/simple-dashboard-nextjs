@@ -1,7 +1,37 @@
 import { DateFormat } from '@/lib/date';
-import { NumberFormat } from '@/lib/number';
 import { Sheet, SHEET_RANGE } from '@/lib/sheet';
 import { NextRequest } from 'next/server';
+
+interface FleetRow {
+  date: string;
+  fleet: string;
+  unit: string;
+  dump: string;
+  trip: string;
+  distance: string;
+}
+
+type Shift = 'DS' | 'NS';
+
+interface TripSummary {
+  shift: Shift;
+  dt: number;
+  trip: number;
+  distance: number;
+  wasteDump: string;
+  units: string[];
+}
+
+interface FleetSummary {
+  fleet: string;
+  trip: TripSummary[];
+}
+
+interface DailySummary {
+  date: string;
+  dayShift: FleetSummary[];
+  nightShift: FleetSummary[];
+}
 
 function filterByPeriod<T extends { date?: string }>(
   data: T[],
@@ -11,6 +41,59 @@ function filterByPeriod<T extends { date?: string }>(
     if (!item.date) return false;
     const [_, month, year] = item.date.split('/');
     return `${month}-${year}` === period;
+  });
+}
+
+function processShiftData(
+  rows: (FleetRow & { shift: Shift })[],
+  shift: Shift,
+): FleetSummary[] {
+  const fleets = Array.from(new Set(rows.map((r) => r.fleet)));
+
+  return fleets.map((fleetId) => {
+    const fleetRows = rows.filter((r) => r.fleet === fleetId);
+
+    const dumpMap = new Map<
+      string,
+      {
+        trip: number;
+        distance: number;
+        wasteDump: string;
+        units: Set<string>;
+      }
+    >();
+
+    for (const r of fleetRows) {
+      const dump = r.dump;
+      const trip = parseInt(r.trip || '0');
+      const distance = parseInt(r.distance || '0');
+      const unit = r.unit;
+
+      if (!dumpMap.has(dump)) {
+        dumpMap.set(dump, {
+          trip,
+          distance,
+          wasteDump: dump,
+          units: new Set([unit]),
+        });
+      } else {
+        const val = dumpMap.get(dump)!;
+        val.trip += trip;
+        val.units.add(unit);
+      }
+    }
+
+    return {
+      fleet: fleetId,
+      trip: Array.from(dumpMap.values()).map((item) => ({
+        shift,
+        dt: item.units.size,
+        trip: item.trip,
+        distance: item.distance,
+        wasteDump: item.wasteDump,
+        units: Array.from(item.units).sort(),
+      })),
+    };
   });
 }
 
@@ -36,39 +119,41 @@ export async function GET(req: NextRequest) {
       period = `${mm}-${yyyy}`;
     }
 
-    const [summaryRaw, dayShiftRaw, nightShiftRaw] = await Promise.all([
-      Sheet.read(SHEET_RANGE.summary),
-      Sheet.read(SHEET_RANGE.fleetDs),
-      Sheet.read(SHEET_RANGE.fleetNs),
+    const [dsRaw, nsRaw] = await Promise.all([
+      Sheet.read(SHEET_RANGE.ds),
+      Sheet.read(SHEET_RANGE.ns),
     ]);
 
-    const summary = filterByPeriod(summaryRaw as SummaryRow[], period).filter(
-      (s) => NumberFormat.parse(s.actDaily) > 0,
-    );
-    const dayShift = filterByPeriod(dayShiftRaw as FleetRow[], period);
-    const nightShift = filterByPeriod(nightShiftRaw as FleetRow[], period);
+    const dayShift = filterByPeriod(dsRaw as FleetRow[], period);
+    const nightShift = filterByPeriod(nsRaw as FleetRow[], period);
 
     const uniqueDates = Array.from(
-      new Set([...summary, ...dayShift, ...nightShift].map((r) => r.date)),
+      new Set([...dayShift, ...nightShift].map((r) => r.date)),
     ).sort(
       (a, b) =>
         DateFormat.timestampFromSheet(b ?? '') -
         DateFormat.timestampFromSheet(a ?? ''),
     );
 
-    const combined = uniqueDates.map((date) => ({
-      date,
-      summary: summary.find((s) => s.date === date) || null,
-      dayShift: dayShift.filter((d) => d.date === date),
-      nightShift: nightShift.filter((n) => n.date === date),
-    }));
+    const outputData: DailySummary[] = uniqueDates.map((date) => {
+      const labeledDS = dayShift
+        .filter((r) => r.date === date)
+        .map((r) => ({ ...r, shift: 'DS' as const }));
+
+      const labeledNS = nightShift
+        .filter((r) => r.date === date)
+        .map((r) => ({ ...r, shift: 'NS' as const }));
+
+      return {
+        date,
+        dayShift: processShiftData(labeledDS, 'DS'),
+        nightShift: processShiftData(labeledNS, 'NS'),
+      };
+    });
 
     return Response.json({
       success: true,
-      data: {
-        month: DateFormat.monthNameFromPeriod(period),
-        items: combined,
-      },
+      data: outputData,
     });
   } catch (error) {
     return Response.json(

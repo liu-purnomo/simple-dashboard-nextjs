@@ -2,7 +2,7 @@
 
 import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { fetchAPI } from '@/lib/fetcher';
-import { Normalize } from '@/lib/normalize';
+import { NumberFormat } from '@/lib/number';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
@@ -41,8 +41,10 @@ export const DailySummaryPage: FC<{
                   </div>
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
                     {Number(
-                      (Normalize.number(dispatchQuery?.data?.production.actDs) /
-                        Normalize.number(
+                      (NumberFormat.parse(
+                        dispatchQuery?.data?.production.actDs,
+                      ) /
+                        NumberFormat.parse(
                           dispatchQuery?.data?.production.planDs,
                         )) *
                         100,
@@ -79,7 +81,7 @@ export const DailySummaryPage: FC<{
                 </div>
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
-                  <div>
+                  {/* <div>
                     {Number(
                       Normalize.number(dispatchQuery?.data?.fuel.ds) /
                         Normalize.number(dispatchQuery?.data?.production.actDs),
@@ -88,7 +90,7 @@ export const DailySummaryPage: FC<{
                       minimumFractionDigits: 2,
                     })}{' '}
                     Liter / BCM
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="panel bg-gradient-to-r  from-fuchsia-500 to-fuchsia-400">
@@ -96,7 +98,7 @@ export const DailySummaryPage: FC<{
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
                     Night Shift
                   </div>
-                  <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
+                  {/* <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
                     {Number(
                       (Normalize.number(dispatchQuery?.data?.production.actNs) /
                         Normalize.number(
@@ -105,7 +107,7 @@ export const DailySummaryPage: FC<{
                         100,
                     ).toFixed(2)}
                     %
-                  </div>
+                  </div> */}
                 </div>
                 <div className="mt-5 flex items-center">
                   <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
@@ -136,7 +138,7 @@ export const DailySummaryPage: FC<{
                 </div>
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
-                  <div>
+                  {/* <div>
                     {Number(
                       Normalize.number(dispatchQuery?.data?.fuel.ns) /
                         Normalize.number(dispatchQuery?.data?.production.actNs),
@@ -145,7 +147,7 @@ export const DailySummaryPage: FC<{
                       minimumFractionDigits: 2,
                     })}{' '}
                     Liter / BCM
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -184,7 +186,7 @@ export const DailySummaryPage: FC<{
                 </div>
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
-                  <div>
+                  {/* <div>
                     {Normalize.number(
                       dispatchQuery?.data?.fuelRatio,
                     ).toLocaleString('id-ID', {
@@ -192,7 +194,7 @@ export const DailySummaryPage: FC<{
                       minimumFractionDigits: 2,
                     })}{' '}
                     Liter / BCM
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="panel text-dark bg-gradient-to-r from-slate-100 to-slate-200">
