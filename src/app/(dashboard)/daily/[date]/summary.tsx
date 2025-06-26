@@ -1,14 +1,23 @@
 'use client';
 
+import { TableFleet } from '@/components/tables/table-fleet';
+import { TableFuelOut } from '@/components/tables/table-fuel-out';
+import { TableMaintenance } from '@/components/tables/table-maintenance';
 import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { DateFormat } from '@/lib/date';
 import { fetchAPI } from '@/lib/fetcher';
 import { NumberFormat } from '@/lib/number';
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import { FC } from 'react';
-import { TableFleet } from '../../summary/table-fleet';
-import { TableFuelOut } from '../../summary/table-fuel-out';
-import { TableMaintenance } from '../../summary/table-maintenance';
+
+const getDiff = (date: string, isY: boolean = false) => {
+  const [day, month, year] = date.split('-');
+  const y = isY ? Number(day) - 1 : Number(day) + 1;
+
+  return `${y.toString().padStart(2, '0')}-${month}-${year}`;
+};
 
 export const DailySummaryPage: FC<{
   date: string;
@@ -207,11 +216,12 @@ export const DailySummaryPage: FC<{
             </div>
 
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">MAINTENANCE DAY SHIFT</div>
+              <div className="font-bold">DATA MAINTENANCE</div>
             </div>
 
             <div>
               <TableMaintenance
+                tableName="Maintenance Day Shift"
                 data={
                   dispatchQuery?.data?.plant?.filter(
                     (e: PlantSummary) => e.shift == '1',
@@ -220,12 +230,9 @@ export const DailySummaryPage: FC<{
               />
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">MAINTENANCE NIGHT SHIFT</div>
-            </div>
-
             <div>
               <TableMaintenance
+                tableName="Maintenance Night Shift"
                 data={
                   dispatchQuery?.data?.plant?.filter(
                     (e: PlantSummary) => e.shift == '2',
@@ -235,11 +242,12 @@ export const DailySummaryPage: FC<{
             </div>
 
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">FUEL OUT DAY SHIFT</div>
+              <div className="font-bold">DATA FUEL</div>
             </div>
 
             <div>
               <TableFuelOut
+                tableName="Fuel Day Shift"
                 data={
                   dispatchQuery?.data?.fuel?.filter(
                     (e: FuelOutRow) => e.shift == 'Day Shift',
@@ -248,12 +256,9 @@ export const DailySummaryPage: FC<{
               />
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">FUEL OUT NIGHT SHIFT</div>
-            </div>
-
             <div>
               <TableFuelOut
+                tableName="Fuel Night Shift"
                 data={
                   dispatchQuery?.data?.fuel?.filter(
                     (e: FuelOutRow) => e.shift == 'Night Shift',
@@ -264,6 +269,26 @@ export const DailySummaryPage: FC<{
           </div>
         </div>
       )}
+
+      <div className="my-5 panel max-w-3xl mx-auto  flex mb-5 justify-between items-center">
+        <Link
+          href={getDiff(date, true)}
+          className="flex items-center gap-2 hover:text-primary"
+        >
+          <IconArrowLeft className="w-6" />
+          Kemarin
+        </Link>
+        <Link href={'/'} className=" hover:text-primary">
+          Beranda
+        </Link>
+        <Link
+          href={getDiff(date)}
+          className="flex items-center gap-2 hover:text-primary"
+        >
+          Besok
+          <IconArrowRight className="w-6" />
+        </Link>
+      </div>
     </div>
   );
 };

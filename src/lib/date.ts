@@ -125,10 +125,14 @@ export class DateFormat {
   }
 
   static toIndonesianFullDate(input: Date | string = new Date()): string {
-    const parsed =
-      typeof input === 'string'
-        ? parse(input, 'dd-MM-yyyy', new Date())
-        : new Date(input);
+    let parsed: Date;
+
+    if (typeof input === 'string') {
+      const normalized = input.replace(/\//g, '-');
+      parsed = parse(normalized, 'dd-MM-yyyy', new Date());
+    } else {
+      parsed = new Date(input);
+    }
 
     return isValid(parsed)
       ? format(parsed, 'EEEE, dd MMMM yyyy', { locale: id })

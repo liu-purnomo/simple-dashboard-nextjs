@@ -1,8 +1,9 @@
 'use client';
 
+import { TableFleet } from '@/components/tables/table-fleet';
 import { DateFormat } from '@/lib/date';
+import Link from 'next/link';
 import { useState } from 'react';
-import { TableFleet } from './table-fleet';
 
 const clean = (val: string | number): number => {
   if (typeof val === 'number') return val;
@@ -41,9 +42,13 @@ export const DayCard = ({
 
   return (
     <div className="panel">
-      <div className="btn cursor-pointer btn-outline-success w-full">
+      <Link
+        className="btn cursor-pointer btn-outline-success w-full"
+        target="_blank"
+        href={`/daily/${data?.date?.replace(/\//g, '-')}`}
+      >
         {DateFormat.toIndonesianFullDate(data?.date)}
-      </div>
+      </Link>
 
       <table className="table-striped mt-2">
         <thead>

@@ -1,6 +1,6 @@
 'use client';
 
-import { no } from './day-card';
+import { no } from '../../app/(dashboard)/summary/day-card';
 
 function groupByFleet(data: FleetSummary[]): Record<string, TripSummary[]> {
   const grouped: Record<string, TripSummary[]> = {};
