@@ -42,10 +42,12 @@ export const DayCard = ({
 
   return (
     <div className="panel">
-      <Link target="_blank" href={`/daily/${data?.date}`}>
-        <div className="btn cursor-pointer btn-outline-success w-full">
-          {DateFormat.toIndonesianFullDate(data?.date)}
-        </div>
+      <Link
+        className="btn cursor-pointer btn-outline-success w-full"
+        target="_blank"
+        href={`/daily/${data?.date?.replace(/\//g, '-')}`}
+      >
+        {DateFormat.toIndonesianFullDate(data?.date)}
       </Link>
 
       <table className="table-striped mt-2">
