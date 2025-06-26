@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { FC } from 'react';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+import { FloatingBottomBar } from './bottom-bar';
 
 const getDiff = (date: string, isY: boolean = false) => {
   const [day, month, year] = date.split('-');
@@ -29,6 +30,8 @@ export const DailySummaryPage: FC<{
 
   return (
     <div>
+      <FloatingBottomBar />
+
       <div className="my-5 panel max-w-3xl mx-auto  flex mb-5 justify-between items-center">
         <Link href={getDiff(date, true)} className="btn btn-outline-primary ">
           <IoIosArrowBack className="me-2" />
@@ -48,7 +51,10 @@ export const DailySummaryPage: FC<{
       ) : (
         <div className="w-full">
           <div className="my-5 max-w-3xl mx-auto gap-2 space-y-6">
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
+            <div
+              id="summary"
+              className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between"
+            >
               <div className="font-bold text-xl">SUMMARY</div>
               <div className="font-bold text-xl">PT ARTA DAYA TARUNA</div>
               <div>Site BBA - Berau, Kalimantan Timur</div>
@@ -213,7 +219,10 @@ export const DailySummaryPage: FC<{
               </div>
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
+            <div
+              id="fleet"
+              className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between"
+            >
               <div className="font-bold">FLEET DAY SHIFT</div>
             </div>
 
@@ -229,7 +238,10 @@ export const DailySummaryPage: FC<{
               <TableFleet data={dispatchQuery?.data?.nightShift ?? []} />
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
+            <div
+              id="maintenance"
+              className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between"
+            >
               <div className="font-bold">DATA MAINTENANCE</div>
             </div>
 
@@ -238,7 +250,8 @@ export const DailySummaryPage: FC<{
                 tableName="Maintenance Day Shift"
                 data={
                   dispatchQuery?.data?.plant?.filter(
-                    (e: PlantSummary) => e.shift == '1',
+                    (e: PlantSummary) =>
+                      e.shift == '1' && e.status === 'BREAKDOWN',
                   ) ?? []
                 }
               />
@@ -249,13 +262,17 @@ export const DailySummaryPage: FC<{
                 tableName="Maintenance Night Shift"
                 data={
                   dispatchQuery?.data?.plant?.filter(
-                    (e: PlantSummary) => e.shift == '2',
+                    (e: PlantSummary) =>
+                      e.shift == '2' && e.status === 'BREAKDOWN',
                   ) ?? []
                 }
               />
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
+            <div
+              id="fuel"
+              className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between"
+            >
               <div className="font-bold">DATA FUEL</div>
             </div>
 
@@ -284,7 +301,7 @@ export const DailySummaryPage: FC<{
         </div>
       )}
 
-      <div className="my-5 panel max-w-3xl mx-auto  flex mb-5 justify-between items-center">
+      <div className="my-5 panel max-w-3xl mx-auto  flex mb-10 justify-between items-center">
         <Link href={getDiff(date, true)} className="btn btn-outline-primary ">
           <IoIosArrowBack className="me-2" />
           Kemarin
