@@ -145,8 +145,6 @@ export async function GET(
         summary: findByDate(summary as any[]),
         fuel: filterByDate(fuel as any[]),
         plant: filterByDate(plant as any[]),
-      },
-      fleetSummary: {
         dayShift: processShiftData(labeledDS, 'DS'),
         nightShift: processShiftData(labeledNS, 'NS'),
       },

@@ -127,7 +127,7 @@ export class DateFormat {
   static toIndonesianFullDate(input: Date | string = new Date()): string {
     const parsed =
       typeof input === 'string'
-        ? parse(input, 'dd/MM/yyyy', new Date())
+        ? parse(input, 'dd-MM-yyyy', new Date())
         : new Date(input);
 
     return isValid(parsed)

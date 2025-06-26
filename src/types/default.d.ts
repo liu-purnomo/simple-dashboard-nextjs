@@ -59,3 +59,23 @@ interface DailySummary {
   dayShift: FleetSummary[];
   nightShift: FleetSummary[];
 }
+
+interface PlantSummary {
+  date: string;
+  shift: string;
+  unit: string;
+  hm: string | null;
+  problem: string;
+  type: string;
+  status: string;
+}
+
+interface FuelOutRow {
+  date: string;
+  unit: string;
+  hm: string;
+  remainingEstimate: string;
+  qty: string;
+  time: string;
+  shift: 'Day Shift' | 'Night Shift' | 'Unknown';
+}
