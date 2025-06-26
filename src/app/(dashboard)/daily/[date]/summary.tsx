@@ -13,13 +13,15 @@ export const DailySummaryPage: FC<{
     queryFn: () => fetchAPI(`/api/summary/${date}`),
   });
 
+  console.log(dispatchQuery?.data);
+
   return (
     <div>
       {dispatchQuery.isLoading || dispatchQuery.isFetching ? (
         <SkeletonLoading />
       ) : (
         <div className="w-full">
-          {/* <div className="my-5 max-w-xl mx-auto gap-2 space-y-6">
+          <div className="my-5 max-w-xl mx-auto gap-2 space-y-6">
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
               <div className="font-bold text-xl">SUMMARY</div>
               <div className="font-bold text-xl">PT ARTA DAYA TARUNA</div>
@@ -28,7 +30,7 @@ export const DailySummaryPage: FC<{
                 {new Date(date).toLocaleDateString('id-ID', {
                   dateStyle: 'full',
                 })}{' '}
-                ({dispatchQuery?.data?.production.week})
+                ({dispatchQuery?.data?.summary?.week})
               </div>
             </div>
 
@@ -39,19 +41,12 @@ export const DailySummaryPage: FC<{
                     Day Shift
                   </div>
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
-                    {Number(
-                      (Normalize.number(dispatchQuery?.data?.production.actDs) /
-                        Normalize.number(
-                          dispatchQuery?.data?.production.planDs,
-                        )) *
-                        100,
-                    ).toFixed(2)}
-                    %
+                    {dispatchQuery?.data?.summary?.achDs}%
                   </div>
                 </div>
                 <div className="mt-5 flex items-center">
                   <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                    {dispatchQuery?.data?.production.actDs}
+                    {dispatchQuery?.data?.summary?.actDs}
                   </div>
                   <div className="badge bg-white/30">BCM</div>
                 </div>
@@ -61,7 +56,7 @@ export const DailySummaryPage: FC<{
                 </div>
                 <div className="mt-1 flex items-center justify-between font-semibold">
                   <div>Planning</div>
-                  <div>{dispatchQuery?.data?.production.planDs} BCM</div>
+                  <div>{dispatchQuery?.data?.summary?.planDs} BCM</div>
                 </div>
                 <div className="mt-1 flex justify-between items-center font-semibold">
                   <div>Fuel</div>
@@ -79,13 +74,7 @@ export const DailySummaryPage: FC<{
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
                   <div>
-                    {Number(
-                      Normalize.number(dispatchQuery?.data?.fuel.ds) /
-                        Normalize.number(dispatchQuery?.data?.production.actDs),
-                    ).toLocaleString('id-ID', {
-                      maximumFractionDigits: 2,
-                      minimumFractionDigits: 2,
-                    })}{' '}
+                    {}
                     Liter / BCM
                   </div>
                 </div>
@@ -96,19 +85,12 @@ export const DailySummaryPage: FC<{
                     Night Shift
                   </div>
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
-                    {Number(
-                      (Normalize.number(dispatchQuery?.data?.production.actNs) /
-                        Normalize.number(
-                          dispatchQuery?.data?.production.planNs,
-                        )) *
-                        100,
-                    ).toFixed(2)}
-                    %
+                    {}%
                   </div>
                 </div>
                 <div className="mt-5 flex items-center">
                   <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                    {dispatchQuery?.data?.production.actNs}
+                    {dispatchQuery?.data?.summary?.actNs}
                   </div>
                   <div className="badge bg-white/30">BCM</div>
                 </div>
@@ -118,7 +100,7 @@ export const DailySummaryPage: FC<{
                 </div>
                 <div className="mt-1 flex items-center justify-between font-semibold">
                   <div>Planning</div>
-                  <div>{dispatchQuery?.data?.production.planNs} BCM</div>
+                  <div>{dispatchQuery?.data?.summary?.planNs} BCM</div>
                 </div>
                 <div className="mt-1 flex justify-between items-center font-semibold">
                   <div>Fuel</div>
@@ -136,13 +118,7 @@ export const DailySummaryPage: FC<{
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
                   <div>
-                    {Number(
-                      Normalize.number(dispatchQuery?.data?.fuel.ns) /
-                        Normalize.number(dispatchQuery?.data?.production.actNs),
-                    ).toLocaleString('id-ID', {
-                      maximumFractionDigits: 2,
-                      minimumFractionDigits: 2,
-                    })}{' '}
+                    {}
                     Liter / BCM
                   </div>
                 </div>
@@ -154,19 +130,19 @@ export const DailySummaryPage: FC<{
                     Daily
                   </div>
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
-                    {dispatchQuery?.data?.production.achDaily}
+                    {dispatchQuery?.data?.summary?.achDaily}
                   </div>
                 </div>
                 <div className="mt-5 flex items-center">
                   <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                    {dispatchQuery?.data?.production.actDaily}
+                    {dispatchQuery?.data?.summary?.actDaily}
                   </div>
                   <div className="badge bg-primary/30">BCM</div>
                 </div>
 
                 <div className="mt-1 flex items-center justify-between font-semibold">
                   <div>Planning</div>
-                  <div>{dispatchQuery?.data?.production.planDaily} BCM</div>
+                  <div>{dispatchQuery?.data?.summary?.planDaily} BCM</div>
                 </div>
                 <div className="mt-1 flex justify-between items-center font-semibold">
                   <div>Fuel</div>
@@ -184,12 +160,7 @@ export const DailySummaryPage: FC<{
                 <div className="mt-1 justify-between flex items-center font-semibold">
                   <div>Fuel Ratio</div>
                   <div>
-                    {Normalize.number(
-                      dispatchQuery?.data?.fuelRatio,
-                    ).toLocaleString('id-ID', {
-                      maximumFractionDigits: 2,
-                      minimumFractionDigits: 2,
-                    })}{' '}
+                    {}
                     Liter / BCM
                   </div>
                 </div>
@@ -200,19 +171,19 @@ export const DailySummaryPage: FC<{
                     Month To Date
                   </div>
                   <div className="text-md font-semibold ltr:mr-1 rtl:ml-1">
-                    {dispatchQuery?.data?.production.achMTD}
+                    {dispatchQuery?.data?.summary?.achMTD}
                   </div>
                 </div>
                 <div className="mt-5 flex items-center">
                   <div className="text-3xl font-bold ltr:mr-3 rtl:ml-3">
-                    {dispatchQuery?.data?.production.actMTD}
+                    {dispatchQuery?.data?.summary?.actMTD}
                   </div>
                   <div className="badge bg-primary/30">BCM</div>
                 </div>
 
                 <div className="mt-1 flex items-center justify-between font-semibold">
                   <div>Planning</div>
-                  <div>{dispatchQuery?.data?.production.planMTD} BCM</div>
+                  <div>{dispatchQuery?.data?.summary?.planMTD} BCM</div>
                 </div>
               </div>
             </div>
@@ -308,7 +279,7 @@ export const DailySummaryPage: FC<{
                 </table>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
       )}
     </div>

@@ -1,7 +1,9 @@
+import { authOptions } from '@/lib/auth-options';
 import { DateFormat } from '@/lib/date';
 import { NumberFormat } from '@/lib/number';
 import { Sheet, SHEET_RANGE } from '@/lib/sheet';
-import { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 function filterByPeriod<T extends { date?: string }>(
   data: T[],
@@ -16,11 +18,23 @@ function filterByPeriod<T extends { date?: string }>(
 
 export async function GET(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user?.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Access Denied',
+        },
+        { status: 401 },
+      );
+    }
+
     const { searchParams } = new URL(req.url);
     let period = searchParams.get('period');
 
     if (period && !/^\d{2}-\d{4}$/.test(period)) {
-      return Response.json(
+      return NextResponse.json(
         {
           success: false,
           error: 'Invalid period format. Expected format: MM-YYYY',
@@ -42,7 +56,7 @@ export async function GET(req: NextRequest) {
       (s) => NumberFormat.parse(s.actDaily) > 0,
     );
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
       data: {
         month: DateFormat.monthNameFromPeriod(period),
@@ -50,7 +64,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : String(error),

@@ -14,6 +14,8 @@ export const DailySummaryPage: FC<{
     queryFn: () => fetchAPI(`/api/summary/${date}`),
   });
 
+  console.log(dispatchQuery, '<<<<<<<<<<<< DISPATCH QUERY');
+
   return (
     <div>
       {dispatchQuery.isLoading || dispatchQuery.isFetching ? (

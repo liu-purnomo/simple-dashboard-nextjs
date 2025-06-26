@@ -60,29 +60,18 @@ export async function GET(
   const normalizedDate = date.replace(/-/g, '/'); // convert to dd/mm/yyyy
 
   try {
-    const [summary, ds, ns, fuel, plant] = await Promise.all([
-      Sheet.read(SHEET_RANGE.summary),
+    const [dsRaw, nsRaw] = await Promise.all([
       Sheet.read(SHEET_RANGE.ds),
       Sheet.read(SHEET_RANGE.ns),
-      Sheet.read(SHEET_RANGE.fuel),
-      Sheet.read(SHEET_RANGE.plant),
     ]);
 
-    const filterByDate = <T extends { date?: string }>(data: T[]) =>
-      data.filter((item) => item.date === normalizedDate);
+    const labeledDS = (dsRaw as FleetRow[])
+      .filter((r) => r.date === normalizedDate)
+      .map((r) => ({ ...r, shift: 'DS' as const }));
 
-    const findByDate = <T extends { date?: string }>(data: T[]) =>
-      data.find((item) => item.date === normalizedDate);
-
-    const labeledDS = filterByDate(ds as FleetRow[]).map((r) => ({
-      ...r,
-      shift: 'DS' as const,
-    }));
-
-    const labeledNS = filterByDate(ns as FleetRow[]).map((r) => ({
-      ...r,
-      shift: 'NS' as const,
-    }));
+    const labeledNS = (nsRaw as FleetRow[])
+      .filter((r) => r.date === normalizedDate)
+      .map((r) => ({ ...r, shift: 'NS' as const }));
 
     const processShiftData = (
       rows: (FleetRow & { shift: Shift })[],
@@ -141,15 +130,8 @@ export async function GET(
     return NextResponse.json({
       success: true,
       date: normalizedDate,
-      data: {
-        summary: findByDate(summary as any[]),
-        fuel: filterByDate(fuel as any[]),
-        plant: filterByDate(plant as any[]),
-      },
-      fleetSummary: {
-        dayShift: processShiftData(labeledDS, 'DS'),
-        nightShift: processShiftData(labeledNS, 'NS'),
-      },
+      dayShift: processShiftData(labeledDS, 'DS'),
+      nightShift: processShiftData(labeledNS, 'NS'),
     });
   } catch (error) {
     return NextResponse.json(
