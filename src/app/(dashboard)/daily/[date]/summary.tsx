@@ -28,6 +28,16 @@ export const DailySummaryPage: FC<{
     queryFn: () => fetchAPI(`/api/summary/${date}`),
   });
 
+  const bdDs =
+    dispatchQuery?.data?.plant?.filter(
+      (e: PlantSummary) => e.shift == '1' && e.status === 'BREAKDOWN',
+    )?.length || 0;
+
+  const bdNs =
+    dispatchQuery?.data?.plant?.filter(
+      (e: PlantSummary) => e.shift == '2' && e.status === 'BREAKDOWN',
+    )?.length || 0;
+
   return (
     <div>
       <FloatingBottomBar />
@@ -105,6 +115,10 @@ export const DailySummaryPage: FC<{
                     / BCM
                   </div>
                 </div>
+                <div className="mt-1 justify-between flex items-center font-semibold">
+                  <div>Unit Breakdown</div>
+                  <div>{bdDs} unit</div>
+                </div>
               </div>
               <div className="panel bg-gradient-to-r  from-fuchsia-500 to-fuchsia-400">
                 <div className="flex justify-between">
@@ -145,6 +159,10 @@ export const DailySummaryPage: FC<{
                     {NumberFormat.no(dispatchQuery?.data?.summary?.frNs)} Liter
                     / BCM
                   </div>
+                </div>
+                <div className="mt-1 justify-between flex items-center font-semibold">
+                  <div>Unit Breakdown</div>
+                  <div>{bdNs} unit</div>
                 </div>
               </div>
 
