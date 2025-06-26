@@ -1,14 +1,14 @@
 'use client';
 
+import { TableFleet } from '@/components/tables/table-fleet';
+import { TableFuelOut } from '@/components/tables/table-fuel-out';
+import { TableMaintenance } from '@/components/tables/table-maintenance';
 import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { DateFormat } from '@/lib/date';
 import { fetchAPI } from '@/lib/fetcher';
 import { NumberFormat } from '@/lib/number';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
-import { TableFleet } from '../../summary/table-fleet';
-import { TableFuelOut } from '../../summary/table-fuel-out';
-import { TableMaintenance } from '../../summary/table-maintenance';
 
 export const DailySummaryPage: FC<{
   date: string;
@@ -24,7 +24,7 @@ export const DailySummaryPage: FC<{
         <SkeletonLoading />
       ) : (
         <div className="w-full">
-          <div className="my-5 max-w-3xl mx-auto gap-2 space-y-6">
+          <div className="my-5 max-w-5xl mx-auto gap-2 space-y-6">
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
               <div className="font-bold text-xl">SUMMARY</div>
               <div className="font-bold text-xl">PT ARTA DAYA TARUNA</div>
@@ -235,11 +235,12 @@ export const DailySummaryPage: FC<{
             </div>
 
             <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">FUEL OUT DAY SHIFT</div>
+              <div className="font-bold">DATA FUEL</div>
             </div>
 
             <div>
               <TableFuelOut
+                tableName="Fuel Day Shift"
                 data={
                   dispatchQuery?.data?.fuel?.filter(
                     (e: FuelOutRow) => e.shift == 'Day Shift',
@@ -248,12 +249,9 @@ export const DailySummaryPage: FC<{
               />
             </div>
 
-            <div className="panel py-3 flex text-dark bg-gradient-to-r from-slate-100 to-slate-200  flex-col text-center items-center justify-between">
-              <div className="font-bold">FUEL OUT NIGHT SHIFT</div>
-            </div>
-
             <div>
               <TableFuelOut
+                tableName="Fuel Night Shift"
                 data={
                   dispatchQuery?.data?.fuel?.filter(
                     (e: FuelOutRow) => e.shift == 'Night Shift',
