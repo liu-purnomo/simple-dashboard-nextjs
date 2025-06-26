@@ -7,10 +7,10 @@ import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { DateFormat } from '@/lib/date';
 import { fetchAPI } from '@/lib/fetcher';
 import { NumberFormat } from '@/lib/number';
-import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { FC } from 'react';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 const getDiff = (date: string, isY: boolean = false) => {
   const [day, month, year] = date.split('-');
@@ -29,6 +29,20 @@ export const DailySummaryPage: FC<{
 
   return (
     <div>
+      <div className="my-5 panel max-w-3xl mx-auto  flex mb-5 justify-between items-center">
+        <Link href={getDiff(date, true)} className="btn btn-outline-primary ">
+          <IoIosArrowBack className="me-2" />
+          Kemarin
+        </Link>
+        <Link href={'/'} className="btn btn-outline-primary  ">
+          Beranda
+        </Link>
+        <Link href={getDiff(date)} className=" btn btn-outline-primary ">
+          Besok
+          <IoIosArrowForward className="ms-2" />
+        </Link>
+      </div>
+
       {dispatchQuery.isLoading || dispatchQuery.isFetching ? (
         <SkeletonLoading />
       ) : (
@@ -271,22 +285,16 @@ export const DailySummaryPage: FC<{
       )}
 
       <div className="my-5 panel max-w-3xl mx-auto  flex mb-5 justify-between items-center">
-        <Link
-          href={getDiff(date, true)}
-          className="flex items-center gap-2 hover:text-primary"
-        >
-          <IconArrowLeft className="w-6" />
+        <Link href={getDiff(date, true)} className="btn btn-outline-primary ">
+          <IoIosArrowBack className="me-2" />
           Kemarin
         </Link>
-        <Link href={'/'} className=" hover:text-primary">
+        <Link href={'/'} className="btn btn-outline-primary  ">
           Beranda
         </Link>
-        <Link
-          href={getDiff(date)}
-          className="flex items-center gap-2 hover:text-primary"
-        >
+        <Link href={getDiff(date)} className=" btn btn-outline-primary ">
           Besok
-          <IconArrowRight className="w-6" />
+          <IoIosArrowForward className="ms-2" />
         </Link>
       </div>
     </div>

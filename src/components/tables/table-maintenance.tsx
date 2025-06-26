@@ -22,14 +22,11 @@ export const TableMaintenance = ({
       {
         accessorKey: 'problem',
         header: 'Problem',
-        // Cell: ({ row }) => (
-        //   <div className="text-end">{NumberFormat.no(row.original.qty)}</div>
-        // ),
       },
       {
         accessorKey: 'type',
         header: 'Type',
-        size: 100,
+        size: 120,
       },
       {
         accessorKey: 'hm',

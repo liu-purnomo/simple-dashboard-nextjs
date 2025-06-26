@@ -12,6 +12,28 @@ type Item = {
   [key: string]: any;
 };
 
+const monthOptions = [
+  { label: 'Januari', value: 1 },
+  { label: 'Februari', value: 2 },
+  { label: 'Maret', value: 3 },
+  { label: 'April', value: 4 },
+  { label: 'Mei', value: 5 },
+  { label: 'Juni', value: 6 },
+  { label: 'Juli', value: 7 },
+  { label: 'Agustus', value: 8 },
+  { label: 'September', value: 9 },
+  { label: 'Oktober', value: 10 },
+  { label: 'November', value: 11 },
+  { label: 'Desember', value: 12 },
+];
+
+const currentYear = new Date().getFullYear();
+
+const yearOptions = Array.from({ length: currentYear - 2019 + 1 }, (_, i) => {
+  const y = 2020 + i;
+  return { label: String(y), value: y };
+});
+
 type SortOrder = 'Terbaru' | 'Terlama';
 
 export const SummaryPage = () => {
@@ -38,7 +60,7 @@ export const SummaryPage = () => {
 
   const getSortedAndFilteredData = (items: Item[]) => {
     const filtered = search
-      ? items.filter((i) => i.date.includes(search))
+      ? items.filter((i) => i.date.split('/')[0].includes(search))
       : [...items];
 
     filtered.sort((a, b) => {
@@ -70,7 +92,47 @@ export const SummaryPage = () => {
               <div>Periode {DateFormat.monthNameFromPeriod(period)}</div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mb-4  panel">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 panel">
+              <button
+                onClick={handleToggleOrder}
+                className="btn btn-sm btn-secondary w-full"
+              >
+                Urutkan: {order}
+              </button>
+
+              <input
+                type="text"
+                placeholder="Tanggal"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="form-input max-w-md"
+              />
+              <select
+                value={month}
+                onChange={(e) => setMonth(Number(e.target.value))}
+                className="form-select"
+              >
+                {monthOptions.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                value={year}
+                onChange={(e) => setYear(Number(e.target.value))}
+                className="form-select"
+              >
+                {yearOptions.map((y) => (
+                  <option key={y.value} value={y.value}>
+                    {y.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* <div className="grid grid-cols-2 gap-4 mb-4  panel">
               <input
                 type="text"
                 placeholder="Cari tanggal (dd/mm/yyyy)"
@@ -84,7 +146,7 @@ export const SummaryPage = () => {
               >
                 Urutkan: {order}
               </button>
-            </div>
+            </div> */}
 
             <div className="space-y-6">
               {sortedItems.map((data: any, index: number) => {
