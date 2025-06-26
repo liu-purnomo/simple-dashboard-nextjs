@@ -29,11 +29,7 @@ export const TableMaintenance = ({
       {
         accessorKey: 'type',
         header: 'Type',
-        filterVariant: 'select',
-        filterSelectOptions: [
-          { label: 'SM', value: 'SM' },
-          { label: 'UM', value: 'UM' },
-        ],
+        size: 100,
       },
       {
         accessorKey: 'hm',
