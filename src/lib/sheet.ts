@@ -42,4 +42,5 @@ export const SHEET_RANGE = {
   plant: 'PLANT!A1:G',
   user: 'USER!A1:C',
   errorLog: 'ERROR!A1:D',
+  asset: 'ASSET!A1:L',
 };
