@@ -17,7 +17,7 @@ export async function GET() {
       );
     }
 
-    const dataFromSheet = await Sheet.read(SHEET_RANGE.fuel);
+    const dataFromSheet = await Sheet.read(SHEET_RANGE.asset);
 
     if (!dataFromSheet || dataFromSheet.length === 0) {
       return Response.json(

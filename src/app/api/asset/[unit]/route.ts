@@ -1,9 +1,12 @@
 import { authOptions } from '@/lib/auth-options';
 import { Sheet, SHEET_RANGE } from '@/lib/sheet';
 import { getServerSession } from 'next-auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { unit: string } },
+) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -17,9 +20,13 @@ export async function GET() {
       );
     }
 
-    const dataFromSheet = await Sheet.read(SHEET_RANGE.fuel);
+    const { unit } = params;
 
-    if (!dataFromSheet || dataFromSheet.length === 0) {
+    const dataFromSheet = await Sheet.read(SHEET_RANGE.asset);
+
+    const filteredAsset = dataFromSheet.find((asset) => asset.unit === unit);
+
+    if (!filteredAsset) {
       return Response.json(
         {
           success: false,
@@ -29,12 +36,14 @@ export async function GET() {
       );
     }
 
-    return Response.json({
+    return NextResponse.json({
       success: true,
-      data: dataFromSheet,
+      data: {
+        asset: filteredAsset,
+      },
     });
   } catch (error) {
-    return Response.json(
+    return NextResponse.json(
       {
         success: false,
         error: error instanceof Error ? error.message : String(error),
