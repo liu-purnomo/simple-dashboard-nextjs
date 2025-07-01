@@ -1,13 +1,16 @@
 'use client';
 
-import { TableFuelOut } from '@/components/tables/table-fuel-out';
 import { fetchAPI } from '@/lib/fetcher';
+import { NumberFormat } from '@/lib/number';
 import { Skeleton } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useState } from 'react';
 import { FuelInNumber } from './fuel-in-number';
+import { TableFuelOut } from './fuel-table';
 import FuelUsageChart from './fuel-usage';
+import { ProblemBarChart } from './plant-chart';
+import { TableMaintenance } from './plant-table';
 
 type Asset = {
   no: string;
@@ -88,8 +91,27 @@ const CATEGORY_ICONS: { [category: string]: string } = {
   Others: '/assets/icons/Others.png',
 };
 
+export interface PlantStatusResponse {
+  success: boolean;
+  data: {
+    lastRecord: PlantStatusEntry | null;
+    maxHM: PlantStatusEntry | null;
+    raw: PlantStatusEntry[];
+  };
+}
+
+export interface PlantStatusEntry {
+  date: string; // Format: 'YYYY-MM-DD'
+  shift: string;
+  unit: string;
+  hm: number;
+  problem: string;
+  type: string;
+  status: string | null;
+}
+
 export default function TruckAssetDashboard() {
-  const [selectedUnit, setSelectedUnit] = useState<string>('TJ-3011');
+  const [selectedUnit, setSelectedUnit] = useState<string>('TJ-3054');
   const [selectedPeriod, setSelectedPeriod] = useState<string>(
     new Date().toISOString().slice(0, 7), // Default to current month
   );
@@ -112,6 +134,13 @@ export default function TruckAssetDashboard() {
     enabled: !!selectedUnit && !!selectedPeriod, // Only fetch if both are set
   });
 
+  const plantPeriod = useQuery<any>({
+    queryKey: ['plantPeriod', selectedUnit, selectedPeriod],
+    queryFn: () =>
+      fetchAPI(`/api/asset/${selectedUnit}/${selectedPeriod}/plant`),
+    enabled: !!selectedUnit && !!selectedPeriod, // Only fetch if both are set
+  });
+
   const assetOptions = assetList.data?.map((asset: any) => (
     <option key={asset.unit} value={asset.unit}>
       {asset.unit}
@@ -121,6 +150,10 @@ export default function TruckAssetDashboard() {
   const categoryIcon = (category: string) => {
     return CATEGORY_ICONS[category] || CATEGORY_ICONS['Others'];
   };
+
+  const [tab, setTab] = useState<'fuel' | 'maintenance' | 'utilization'>(
+    'fuel',
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -186,13 +219,25 @@ export default function TruckAssetDashboard() {
           </div>
         )}
         <div className="bg-white rounded shadow p-4">
-          <p className="text-sm text-gray-500">Last Hour Meter</p>
-          <p className="font-bold">12,540 HM</p>
+          <p className="text-sm text-gray-500">Last HM (fuel/plant/dispatch)</p>
+          <p className="font-bold">
+            {NumberFormat.no(fuelPeriod?.data?.maxHM?.hm || 0)} /{' '}
+            {NumberFormat.no(plantPeriod?.data?.maxHM?.hm || 0)}{' '}
+          </p>
         </div>
-        <div className="bg-white rounded shadow p-4">
-          <p className="text-sm text-gray-500">Last Status</p>
-          <p className="font-bold">RFU</p>
-        </div>
+        {plantPeriod.isLoading || plantPeriod.isRefetching ? (
+          <Skeleton height={80} />
+        ) : (
+          <div className="bg-white rounded shadow p-4">
+            <p className="text-sm text-gray-500">
+              Last Status {plantPeriod?.data?.lastRecord?.date}
+            </p>
+            <p className="font-bold">
+              {plantPeriod?.data?.lastRecord?.status || 'No Record'} HM :
+              {plantPeriod?.data?.lastRecord?.hm}
+            </p>
+          </div>
+        )}
         <div className="bg-white rounded shadow p-4">
           <p className="text-sm text-gray-500">Last Activity</p>
           <p className="font-bold">Kerja Angkut</p>
@@ -204,82 +249,132 @@ export default function TruckAssetDashboard() {
       {/* Tabs Section */}
       <div>
         <div className="flex gap-2 border-b">
-          <button className="px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600">
+          <button
+            className={`px-4 py-2 text-sm font-medium ${
+              tab === 'fuel'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-blue-600'
+            }`}
+            onClick={() => setTab('fuel')}
+          >
             Fuel Usage
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-blue-600">
+          <button
+            onClick={() => setTab('maintenance')}
+            className={`px-4 py-2 text-sm font-medium ${
+              tab === 'maintenance'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-blue-600'
+            }`}
+          >
             Maintenance
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-blue-600">
+          <button
+            onClick={() => setTab('utilization')}
+            className={`px-4 py-2 text-sm font-medium ${
+              tab === 'utilization'
+                ? 'text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-500 hover:text-blue-600'
+            }`}
+          >
             Work & Utilization
           </button>
         </div>
 
         {/* Fuel Usage */}
-        <div>
-          <FuelUsageChart
-            data={fuelPeriod?.data?.chartData}
-            isLoading={fuelPeriod.isLoading || fuelPeriod.isRefetching}
-          />
-        </div>
+        {tab === 'fuel' && (
+          <>
+            <div>
+              <FuelUsageChart
+                data={fuelPeriod?.data?.chartData}
+                isLoading={fuelPeriod.isLoading || fuelPeriod.isRefetching}
+              />
+            </div>
 
-        <div>
-          <FuelInNumber
-            data={fuelPeriod?.data}
-            isLoading={fuelPeriod.isLoading || fuelPeriod.isRefetching}
-          />
-        </div>
+            <div>
+              <FuelInNumber
+                data={fuelPeriod?.data}
+                isLoading={fuelPeriod.isLoading || fuelPeriod.isRefetching}
+              />
+            </div>
 
-        <div>
-          {fuelPeriod.isLoading || fuelPeriod.isRefetching ? (
-            <Skeleton height={200} />
-          ) : (
-            <TableFuelOut
-              tableName="Table Fuel"
-              data={fuelPeriod?.data?.raw ?? []}
-            />
-          )}
-        </div>
+            <div>
+              {fuelPeriod.isLoading || fuelPeriod.isRefetching ? (
+                <Skeleton height={200} />
+              ) : (
+                <TableFuelOut
+                  tableName="fuel usage"
+                  data={fuelPeriod?.data?.raw ?? []}
+                />
+              )}
+            </div>
+          </>
+        )}
 
         {/* Maintenance */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 hidden">
-          <div className="bg-white rounded shadow p-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              {/* <BarChart className="w-4 h-4" />  */}
-              Downtime Summary
+        {tab === 'maintenance' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <div className="bg-white rounded shadow p-4">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  {/* <BarChart className="w-4 h-4" />  */}
+                  Downtime Summary
+                </div>
+                <div className="h-40 bg-gray-100 rounded flex items-center justify-center text-gray-500">
+                  [Bar Chart Here]
+                </div>
+              </div>
+              <div className="bg-white rounded shadow p-4 space-y-1">
+                <p className="text-sm text-gray-500">Upcoming Maintenance</p>
+                <p className="font-bold">Oil Change - Due in 20 HM</p>
+                <p className="text-sm text-gray-500">Health Status</p>
+                <span className="inline-block px-2 py-1 text-xs bg-yellow-200 text-yellow-900 rounded-full">
+                  Warning
+                </span>
+              </div>
             </div>
-            <div className="h-40 bg-gray-100 rounded flex items-center justify-center text-gray-500">
-              [Bar Chart Here]
-            </div>
-          </div>
-          <div className="bg-white rounded shadow p-4 space-y-1">
-            <p className="text-sm text-gray-500">Upcoming Maintenance</p>
-            <p className="font-bold">Oil Change - Due in 20 HM</p>
-            <p className="text-sm text-gray-500">Health Status</p>
-            <span className="inline-block px-2 py-1 text-xs bg-yellow-200 text-yellow-900 rounded-full">
-              Warning
-            </span>
-          </div>
-        </div>
 
-        {/* Task & Utilization */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 hidden">
-          <div className="bg-white rounded shadow p-4">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              {/* <PieChart className="w-4 h-4" />  */}
-              Task Utilization
+            <div>
+              {plantPeriod?.data?.raw?.length > 0 && (
+                <ProblemBarChart raw={plantPeriod?.data?.raw} />
+              )}
             </div>
-            <div className="h-40 bg-gray-100 rounded flex items-center justify-center text-gray-500">
-              [Pie Chart Here]
+
+            <div>
+              {plantPeriod.isLoading || plantPeriod.isRefetching ? (
+                <Skeleton height={200} />
+              ) : (
+                <TableMaintenance
+                  tableName="maintenance records"
+                  data={plantPeriod?.data?.raw ?? []}
+                />
+              )}
             </div>
           </div>
-          <div className="bg-white rounded shadow p-4 space-y-1">
-            <p className="text-sm text-gray-500">Current Operator</p>
-            <p className="font-bold">John Siregar</p>
-            <p className="text-sm text-gray-500">Total Operated Today</p>
-            <p className="font-bold">5.2 HM</p>
+        )}
+
+        {/* Work & Utilization */}
+        {tab === 'utilization' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+              <div className="bg-white rounded shadow p-4">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  {/* <PieChart className="w-4 h-4" />  */}
+                  Task Utilization
+                </div>
+                <div className="h-40 bg-gray-100 rounded flex items-center justify-center text-gray-500">
+                  [Pie Chart Here]
+                </div>
+              </div>
+              <div className="bg-white rounded shadow p-4 space-y-1">
+                <p className="text-sm text-gray-500">Current Operator</p>
+                <p className="font-bold">John Siregar</p>
+                <p className="text-sm text-gray-500">Total Operated Today</p>
+                <p className="font-bold">5.2 HM</p>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

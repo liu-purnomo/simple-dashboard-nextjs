@@ -110,11 +110,11 @@ export const FuelInNumber = ({
 
             <div className="space-y-2">
               <div className="flex justify-between p-2 bg-primary-light rounded-md">
-                <div>Fuel Variance</div>
+                <div>Fuel variance</div>
                 <div>{'N/A'}</div>
               </div>
               <div className="flex justify-between p-2 bg-danger-light rounded-md">
-                <div>Total usage</div>
+                <div>Total diisi</div>
                 <div>
                   {data?.totalFuelUsed
                     ? NumberFormat.no(data?.totalFuelUsed || 0)
@@ -123,7 +123,7 @@ export const FuelInNumber = ({
                 </div>
               </div>
               <div className="flex justify-between p-2 bg-primary-light rounded-md">
-                <div>Total HM Tercatat</div>
+                <div>Total HM tercatat</div>
                 <div>
                   {data?.totalHM ? NumberFormat.no(data?.totalHM || 0) : 'N/A'}{' '}
                   HM

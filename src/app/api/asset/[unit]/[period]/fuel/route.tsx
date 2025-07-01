@@ -139,6 +139,26 @@ export async function GET(
     const totalHM =
       hmList.length >= 2 ? Math.max(...hmList) - Math.min(...hmList) : 0;
 
+    const maxHMEntry = dataFromSheet
+      .map((item) => {
+        if (!item.date || !item.unit || item.unit.trim() !== unit) return null;
+        const hm = item.hm?.trim() ? parseFloat(item.hm.trim()) : null;
+        const [dd, mm, yyyy] = item.date.split('/');
+        if (!dd || !mm || !yyyy || hm === null) return null;
+
+        return {
+          date: `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`,
+          unit: item.unit.trim(),
+          hm,
+          time: item.time ?? '',
+          shift: item.shift ?? '',
+          remainingEstimate: item.remainingEstimate ?? '',
+        };
+      })
+      .filter((d): d is NonNullable<typeof d> => d !== null)
+      .sort((a, b) => b.hm - a.hm)
+      .at(0);
+
     return NextResponse.json({
       success: true,
       data: {
@@ -148,6 +168,7 @@ export async function GET(
         totalHM,
         chartData,
         raw: filtered,
+        maxHM: maxHMEntry ?? null,
       },
     });
   } catch (error) {
