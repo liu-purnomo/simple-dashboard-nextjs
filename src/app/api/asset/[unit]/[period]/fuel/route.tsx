@@ -9,8 +9,8 @@ type FuelRow = {
   hm?: string;
   qty?: string;
   time?: string;
-  shift?: string;
-  remainingEstimate?: string;
+  remainingEstimate: string;
+  shift: string;
 };
 
 export async function GET(
@@ -59,9 +59,9 @@ export async function GET(
           unit: item.unit.trim(),
           qty: parseFloat(item.qty?.trim() ?? '0') || 0,
           hm: item.hm?.trim() ? parseFloat(item.hm.trim()) : null,
-          time: item.time?.trim() ?? '',
-          shift: item.shift?.trim() ?? '',
-          remainingEstimate: item.remainingEstimate?.trim() ?? '',
+          time: item.time ?? '',
+          remainingEstimate: item?.remainingEstimate ?? '',
+          shift: item?.shift ?? '',
         };
       })
       .filter(
@@ -79,19 +79,9 @@ export async function GET(
     });
 
     // Map entries for fast lookup
-    const entryMap = new Map<
-      string,
-      Omit<NonNullable<typeof filtered>[number], 'date'>
-    >();
+    const entryMap = new Map<string, { qty: number; hm: number | null }>();
     filtered.forEach((item) => {
-      entryMap.set(item.date, {
-        unit: item.unit,
-        qty: item.qty,
-        hm: item.hm,
-        time: item.time,
-        shift: item.shift,
-        remainingEstimate: item.remainingEstimate,
-      });
+      entryMap.set(item.date, { qty: item.qty, hm: item.hm });
     });
 
     // Generate full chartData
@@ -104,18 +94,12 @@ export async function GET(
           date,
           qty: entry.qty,
           hm: entry.hm ?? lastHM,
-          time: entry.time,
-          shift: entry.shift,
-          remainingEstimate: entry.remainingEstimate,
         };
       } else {
         return {
           date,
           qty: 0,
           hm: lastHM,
-          time: '',
-          shift: '',
-          remainingEstimate: '',
         };
       }
     });
@@ -163,6 +147,7 @@ export async function GET(
         totalFuelUsed,
         totalHM,
         chartData,
+        raw: filtered,
       },
     });
   } catch (error) {

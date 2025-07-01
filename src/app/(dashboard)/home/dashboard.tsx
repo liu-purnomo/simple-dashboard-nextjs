@@ -1,5 +1,6 @@
 'use client';
 
+import { TableFuelOut } from '@/components/tables/table-fuel-out';
 import { fetchAPI } from '@/lib/fetcher';
 import { Skeleton } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
@@ -110,8 +111,6 @@ export default function TruckAssetDashboard() {
       fetchAPI(`/api/asset/${selectedUnit}/${selectedPeriod}/fuel`),
     enabled: !!selectedUnit && !!selectedPeriod, // Only fetch if both are set
   });
-
-  console.log('Fuel Period Data:', fuelPeriod.data);
 
   const assetOptions = assetList.data?.map((asset: any) => (
     <option key={asset.unit} value={asset.unit}>
@@ -229,6 +228,17 @@ export default function TruckAssetDashboard() {
             data={fuelPeriod?.data}
             isLoading={fuelPeriod.isLoading || fuelPeriod.isRefetching}
           />
+        </div>
+
+        <div>
+          {fuelPeriod.isLoading || fuelPeriod.isRefetching ? (
+            <Skeleton height={200} />
+          ) : (
+            <TableFuelOut
+              tableName="Table Fuel"
+              data={fuelPeriod?.data?.raw ?? []}
+            />
+          )}
         </div>
 
         {/* Maintenance */}
