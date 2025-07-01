@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -89,25 +90,30 @@ export const CategoryWithListAsset = ({
             {selectedCategory && groupedAssets[selectedCategory]?.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {filteredAssets.map((asset, idx) => (
-                  <div key={asset.no + idx} className="panel">
-                    <div className="flex justify-between items-center">
-                      <Image
-                        src={
-                          CATEGORY_ICONS[selectedCategory] ||
-                          CATEGORY_ICONS['Others']
-                        }
-                        alt={selectedCategory}
-                        width={32}
-                        height={32}
-                        className="w-8 h-8 object-contain"
-                      />
-                      <div className="font-bold">{asset.unit}</div>
-                    </div>
-                    <div>
-                      <div className="">{asset.brand}</div>
-                      <div className="">{asset.classification}</div>
-                      <div className="">{asset.type}</div>
-                    </div>
+                  <div
+                    key={asset.no + idx}
+                    className="panel cursor-pointer hover:bg-white-light"
+                  >
+                    <Link href={`/asset/${asset.unit}`}>
+                      <div className="flex justify-between items-center">
+                        <Image
+                          src={
+                            CATEGORY_ICONS[selectedCategory] ||
+                            CATEGORY_ICONS['Others']
+                          }
+                          alt={selectedCategory}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8 object-contain"
+                        />
+                        <div className="font-bold">{asset.unit}</div>
+                      </div>
+                      <div>
+                        <div className="">{asset.brand}</div>
+                        <div className="">{asset.classification}</div>
+                        <div className="">{asset.type}</div>
+                      </div>
+                    </Link>
                   </div>
                 ))}
               </div>
