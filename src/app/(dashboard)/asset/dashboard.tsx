@@ -5,6 +5,7 @@ import { NumberFormat } from '@/lib/number';
 import { Skeleton } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { FuelInNumber } from './fuel-in-number';
 import { TableFuelOut } from './fuel-table';
@@ -118,7 +119,7 @@ export default function TruckAssetDashboard() {
 
   const assetList = useQuery<any>({
     queryKey: ['assetList'],
-    queryFn: () => fetchAPI(`/api/asset`),
+    queryFn: () => fetchAPI(`/api/fuel/asset`),
   });
 
   const detailAsset = useQuery<any>({
@@ -141,9 +142,9 @@ export default function TruckAssetDashboard() {
     enabled: !!selectedUnit && !!selectedPeriod, // Only fetch if both are set
   });
 
-  const assetOptions = assetList.data?.map((asset: any) => (
-    <option key={asset.unit} value={asset.unit}>
-      {asset.unit}
+  const assetOptions = assetList.data?.map((asset: string) => (
+    <option key={asset} value={asset}>
+      {asset}
     </option>
   ));
 
@@ -159,7 +160,12 @@ export default function TruckAssetDashboard() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Asset Dashboard</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Asset Dashboard</h1>
+          <Link href="/" className="text-sm text-blue-600 hover:underline">
+            Back to Homepage
+          </Link>
+        </div>
         <div className="flex gap-2">
           <select
             className="border rounded p-2 text-sm"

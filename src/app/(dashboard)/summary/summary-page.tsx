@@ -4,6 +4,7 @@ import { SkeletonLoading } from '@/layouts/skeleton-loading';
 import { DateFormat } from '@/lib/date';
 import { fetchAPI } from '@/lib/fetcher';
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DayCard } from './day-card';
 
@@ -90,6 +91,9 @@ export const SummaryPage = () => {
               <div className="font-bold text-xl">PT ARTA DAYA TARUNA</div>
               <div>Site BBA - Berau, Kalimantan Timur</div>
               <div>Periode {DateFormat.monthNameFromPeriod(period)}</div>
+              <Link href="/" className="text-sm text-blue-600 hover:underline">
+                Back to Homepage
+              </Link>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 panel">
