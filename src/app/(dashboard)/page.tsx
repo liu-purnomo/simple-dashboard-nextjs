@@ -459,9 +459,9 @@ export default function DashboardPage() {
                             }`}
                           >
                             {item.achDaily >= 80
-                              ? 'Excellent'
+                              ? 'Good'
                               : item.achDaily >= 60
-                                ? 'Good'
+                                ? 'Fair'
                                 : 'Below Target'}
                           </span>
                         </td>
