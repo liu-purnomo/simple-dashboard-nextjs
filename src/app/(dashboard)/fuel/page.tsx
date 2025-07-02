@@ -42,10 +42,11 @@ export default function FuelEfficiencyPage() {
   // Filter data yang valid (ada fuel efficiency dan totalHm > 0)
   const validData =
     data?.filter(
-      (item) => item.fuelEfficiency !== null,
-      // item.totalHm > 10 &&
-      // item.fuelEfficiency > 0 &&
-      // item.fuelEfficiency < 1000, // Filter out extreme values
+      (item) =>
+        item.fuelEfficiency !== null &&
+        item.totalHm > 10 &&
+        item.fuelEfficiency > 0 &&
+        item.fuelEfficiency < 40, // Filter out extreme values
     ) || [];
 
   // Sort by efficiency (descending - paling boros dulu)
