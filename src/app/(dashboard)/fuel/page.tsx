@@ -33,33 +33,110 @@ export default function FuelEfficiencyPage() {
     new Date().toISOString().slice(0, 7), // Default to current month
   );
 
+  // Filter states
+  const [minEfficiency, setMinEfficiency] = useState<number>(0);
+  const [maxEfficiency, setMaxEfficiency] = useState<number>(50);
+  const [minHours, setMinHours] = useState<number>(10);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedBrand, setSelectedBrand] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'efficiency' | 'hours' | 'fuel'>(
+    'efficiency',
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
   const { data, isLoading } = useQuery<FuelEfficiencyData[]>({
     queryKey: ['fuelEfficiency', selectedPeriod],
     queryFn: () => fetchAPI(`/api/fuel/${selectedPeriod}/efficiency`),
     enabled: !!selectedPeriod,
   });
 
-  // Filter data yang valid (ada fuel efficiency dan totalHm > 0)
-  const validData =
-    data?.filter(
-      (item) =>
-        item.fuelEfficiency !== null &&
-        item.totalHm > 10 &&
-        item.fuelEfficiency > 0 &&
-        item.fuelEfficiency < 40, // Filter out extreme values
-    ) || [];
+  // Get unique categories and brands for filter dropdowns
+  // Get unique categories and brands for filter dropdowns
+  const categories = data
+    ? Array.from(new Set(data.map((item) => item.category).filter(Boolean)))
+    : [];
+  const brands = data
+    ? Array.from(new Set(data.map((item) => item.brand).filter(Boolean)))
+    : [];
 
-  // Sort by efficiency (descending - paling boros dulu)
-  const sortedData = [...validData].sort(
-    (a, b) => (b.fuelEfficiency || 0) - (a.fuelEfficiency || 0),
-  );
+  // Apply filters
+  const filteredData =
+    data?.filter((item) => {
+      // Basic validation
+      if (
+        item.fuelEfficiency === null ||
+        item.totalHm <= 0 ||
+        item.fuelEfficiency <= 0
+      ) {
+        return false;
+      }
 
-  // Ambil average efficiency dari data yang valid
+      // Efficiency range filter
+      if (
+        item.fuelEfficiency < minEfficiency ||
+        item.fuelEfficiency > maxEfficiency
+      ) {
+        return false;
+      }
+
+      // Minimum hours filter
+      if (item.totalHm < minHours) {
+        return false;
+      }
+
+      // Category filter
+      if (selectedCategory !== 'all' && item.category !== selectedCategory) {
+        return false;
+      }
+
+      // Brand filter
+      if (selectedBrand !== 'all' && item.brand !== selectedBrand) {
+        return false;
+      }
+
+      return true;
+    }) || [];
+
+  // Sort data
+  const sortedData = [...filteredData].sort((a, b) => {
+    let aVal: number, bVal: number;
+
+    switch (sortBy) {
+      case 'hours':
+        aVal = a.totalHm;
+        bVal = b.totalHm;
+        break;
+      case 'fuel':
+        aVal = a.fuelUsed;
+        bVal = b.fuelUsed;
+        break;
+      default:
+        aVal = a.fuelEfficiency || 0;
+        bVal = b.fuelEfficiency || 0;
+    }
+
+    return sortOrder === 'desc' ? bVal - aVal : aVal - bVal;
+  });
+
+  // Calculate average efficiency from filtered data
   const averageEfficiency =
-    validData.length > 0
-      ? validData.reduce((sum, item) => sum + (item.fuelEfficiency || 0), 0) /
-        validData.length
+    filteredData.length > 0
+      ? filteredData.reduce(
+          (sum, item) => sum + (item.fuelEfficiency || 0),
+          0,
+        ) / filteredData.length
       : 0;
+
+  // Reset filters
+  const resetFilters = () => {
+    setMinEfficiency(0);
+    setMaxEfficiency(50);
+    setMinHours(10);
+    setSelectedCategory('all');
+    setSelectedBrand('all');
+    setSortBy('efficiency');
+    setSortOrder('desc');
+  };
 
   // Custom tooltip untuk bar chart
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -94,14 +171,150 @@ export default function FuelEfficiencyPage() {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white rounded shadow p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <h2 className="text-lg font-semibold">Filters</h2>
+          <button
+            onClick={resetFilters}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded"
+          >
+            Reset Filters
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          {/* Efficiency Range */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Min Efficiency (L/HM)
+            </label>
+            <input
+              type="number"
+              value={minEfficiency}
+              onChange={(e) => setMinEfficiency(Number(e.target.value))}
+              className="w-full border rounded p-2 text-sm"
+              min="0"
+              step="0.1"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Max Efficiency (L/HM)
+            </label>
+            <input
+              type="number"
+              value={maxEfficiency}
+              onChange={(e) => setMaxEfficiency(Number(e.target.value))}
+              className="w-full border rounded p-2 text-sm"
+              min="0"
+              step="0.1"
+            />
+          </div>
+
+          {/* Min Hours */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Min Hours (HM)
+            </label>
+            <input
+              type="number"
+              value={minHours}
+              onChange={(e) => setMinHours(Number(e.target.value))}
+              className="w-full border rounded p-2 text-sm"
+              min="0"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category
+            </label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full border rounded p-2 text-sm"
+            >
+              <option value="all">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Brand Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Brand
+            </label>
+            <select
+              value={selectedBrand}
+              onChange={(e) => setSelectedBrand(e.target.value)}
+              className="w-full border rounded p-2 text-sm"
+            >
+              <option value="all">All Brands</option>
+              {brands.map((brand) => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort By */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Sort By
+            </label>
+            <select
+              value={sortBy}
+              onChange={(e) =>
+                setSortBy(e.target.value as 'efficiency' | 'hours' | 'fuel')
+              }
+              className="w-full border rounded p-2 text-sm"
+            >
+              <option value="efficiency">Efficiency</option>
+              <option value="hours">Operating Hours</option>
+              <option value="fuel">Fuel Used</option>
+            </select>
+          </div>
+
+          {/* Sort Order */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Order
+            </label>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+              className="w-full border rounded p-2 text-sm"
+            >
+              <option value="desc">High to Low</option>
+              <option value="asc">Low to High</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Filter Summary */}
+        <div className="mt-4 p-3 bg-gray-50 rounded text-sm">
+          <span className="font-medium">Active Filters:</span> Efficiency:{' '}
+          {minEfficiency}-{maxEfficiency} L/HM, Min Hours: {minHours} HM
+          {selectedCategory !== 'all' && `, Category: ${selectedCategory}`}
+          {selectedBrand !== 'all' && `, Brand: ${selectedBrand}`} | Showing{' '}
+          {filteredData.length} of {data?.length || 0} units
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded shadow p-4">
-          <p className="text-sm text-gray-500">Valid Units</p>
-          <p className="font-bold text-xl">{validData.length}</p>
-          <p className="text-xs text-gray-400">
-            Total: {data?.length || 0} (filtered invalid data)
-          </p>
+          <p className="text-sm text-gray-500">Filtered Units</p>
+          <p className="font-bold text-xl">{filteredData.length}</p>
+          <p className="text-xs text-gray-400">Total: {data?.length || 0}</p>
         </div>
         <div className="bg-white rounded shadow p-4">
           <p className="text-sm text-gray-500">Average Efficiency</p>
@@ -110,19 +323,33 @@ export default function FuelEfficiencyPage() {
           </p>
         </div>
         <div className="bg-white rounded shadow p-4">
-          <p className="text-sm text-gray-500">Most Efficient</p>
+          <p className="text-sm text-gray-500">Best Performance</p>
           <p className="font-bold text-green-600">
-            {sortedData[sortedData.length - 1]?.unit || '-'}
+            {sortOrder === 'asc'
+              ? sortedData[0]?.unit
+              : sortedData[sortedData.length - 1]?.unit || '-'}
           </p>
           <p className="text-xs text-gray-400">
-            {sortedData[sortedData.length - 1]?.fuelEfficiency?.toFixed(2)} L/HM
+            {sortOrder === 'asc'
+              ? sortedData[0]?.fuelEfficiency?.toFixed(2)
+              : sortedData[sortedData.length - 1]?.fuelEfficiency?.toFixed(
+                  2,
+                )}{' '}
+            L/HM
           </p>
         </div>
         <div className="bg-white rounded shadow p-4">
-          <p className="text-sm text-gray-500">Least Efficient</p>
-          <p className="font-bold text-red-600">{sortedData[0]?.unit || '-'}</p>
+          <p className="text-sm text-gray-500">Worst Performance</p>
+          <p className="font-bold text-red-600">
+            {sortOrder === 'asc'
+              ? sortedData[sortedData.length - 1]?.unit
+              : sortedData[0]?.unit || '-'}
+          </p>
           <p className="text-xs text-gray-400">
-            {sortedData[0]?.fuelEfficiency?.toFixed(2)} L/HM
+            {sortOrder === 'asc'
+              ? sortedData[sortedData.length - 1]?.fuelEfficiency?.toFixed(2)
+              : sortedData[0]?.fuelEfficiency?.toFixed(2)}{' '}
+            L/HM
           </p>
         </div>
       </div>
@@ -131,9 +358,9 @@ export default function FuelEfficiencyPage() {
         <div className="flex items-center justify-center h-64 text-gray-500">
           Loading...
         </div>
-      ) : validData.length === 0 ? (
+      ) : filteredData.length === 0 ? (
         <div className="flex items-center justify-center h-64 text-gray-500">
-          No valid data found for the selected period
+          No data matches the current filters
         </div>
       ) : (
         <div className="space-y-6">
@@ -195,7 +422,7 @@ export default function FuelEfficiencyPage() {
             </h2>
             <ResponsiveContainer width="100%" height={400}>
               <ScatterChart
-                data={validData}
+                data={filteredData}
                 margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
               >
                 <CartesianGrid />
@@ -223,7 +450,7 @@ export default function FuelEfficiencyPage() {
                   cursor={{ strokeDasharray: '3 3' }}
                   content={<CustomTooltip />}
                 />
-                <Scatter name="Units" data={validData} fill="#8884d8" />
+                <Scatter name="Units" data={filteredData} fill="#8884d8" />
               </ScatterChart>
             </ResponsiveContainer>
           </div>
@@ -233,7 +460,7 @@ export default function FuelEfficiencyPage() {
             <div className="p-6 border-b">
               <h2 className="text-lg font-semibold">Efficiency Details</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Showing {validData.length} units with valid efficiency data
+                Showing {filteredData.length} units with current filters
               </p>
             </div>
             <div className="overflow-x-auto">
@@ -247,10 +474,13 @@ export default function FuelEfficiencyPage() {
                       Unit
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      Type
+                      Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Brand
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      Type
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                       Efficiency (L/HM)
@@ -285,10 +515,13 @@ export default function FuelEfficiencyPage() {
                         {item.unit}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.type}
+                        {item.category}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {item.brand}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {item.type}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <span
@@ -316,8 +549,8 @@ export default function FuelEfficiencyPage() {
                           }`}
                         >
                           {item.fuelEfficiency! > averageEfficiency
-                            ? 'Diatas Rata Rata'
-                            : 'Dibawah Rata Rata'}
+                            ? 'Above Average'
+                            : 'Below Average'}
                         </span>
                       </td>
                     </tr>
