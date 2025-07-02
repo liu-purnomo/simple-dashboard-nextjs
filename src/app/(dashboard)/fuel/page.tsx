@@ -2,6 +2,7 @@
 
 import { fetchAPI } from '@/lib/fetcher';
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 import { useState } from 'react';
 import {
   Bar,
@@ -160,7 +161,12 @@ export default function FuelEfficiencyPage() {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Fuel Efficiency Leaderboard</h1>
+        <div>
+          <h1 className="text-2xl font-bold">Fuel Efficiency Leaderboard</h1>
+          <Link href="/" className="text-sm text-blue-600 hover:underline">
+            Back to Homepage
+          </Link>
+        </div>
         <div className="flex gap-2">
           <input
             type="month"

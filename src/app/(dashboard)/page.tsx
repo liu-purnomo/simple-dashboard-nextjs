@@ -196,21 +196,22 @@ export default function DashboardPage() {
                 </div>
               </div>
             </Link>
-
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Active Fleet</p>
-                  <p className="text-2xl font-bold">
-                    {(latestData?.fleetDs || 0) + (latestData?.fleetNs || 0)}
-                  </p>
-                  <p className="text-purple-100 text-xs">
-                    DS: {latestData?.fleetDs} | NS: {latestData?.fleetNs}
-                  </p>
+            <Link href={`/asset`} className="cursor-pointer">
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-purple-100 text-sm">Active Fleet</p>
+                    <p className="text-2xl font-bold">
+                      {(latestData?.fleetDs || 0) + (latestData?.fleetNs || 0)}
+                    </p>
+                    <p className="text-purple-100 text-xs">
+                      DS: {latestData?.fleetDs} | NS: {latestData?.fleetNs}
+                    </p>
+                  </div>
+                  <div className="text-3xl opacity-80">🚛</div>
                 </div>
-                <div className="text-3xl opacity-80">🚛</div>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Production Trend Chart */}
