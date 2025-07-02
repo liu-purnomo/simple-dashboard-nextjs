@@ -1,12 +1,10 @@
 import { Metadata } from 'next';
-import AssetListPage from './home';
+import TruckAssetDashboard from './dashboard';
 
-// add metadata for the page
 export const metadata: Metadata = {
-  title: 'Asset List',
-  description: 'List of assets managed by the system',
+  title: 'Dashboard',
 };
 
 export default function Page() {
-  return <AssetListPage />;
+  return <TruckAssetDashboard />;
 }

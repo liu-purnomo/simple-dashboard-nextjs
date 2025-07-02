@@ -118,7 +118,7 @@ export default function TruckAssetDashboard() {
 
   const assetList = useQuery<any>({
     queryKey: ['assetList'],
-    queryFn: () => fetchAPI(`/api/asset`),
+    queryFn: () => fetchAPI(`/api/fuel/asset`),
   });
 
   const detailAsset = useQuery<any>({
@@ -141,9 +141,9 @@ export default function TruckAssetDashboard() {
     enabled: !!selectedUnit && !!selectedPeriod, // Only fetch if both are set
   });
 
-  const assetOptions = assetList.data?.map((asset: any) => (
-    <option key={asset.unit} value={asset.unit}>
-      {asset.unit}
+  const assetOptions = assetList.data?.map((asset: string) => (
+    <option key={asset} value={asset}>
+      {asset}
     </option>
   ));
 

@@ -2,7 +2,6 @@
 
 import { fetchAPI } from '@/lib/fetcher';
 import { useQuery } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useState } from 'react';
 import {
   Area,
@@ -117,7 +116,7 @@ export default function DashboardPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-800">
-            PT. Arta Daya Taruna
+            Production Dashboard
           </h1>
           <p className="text-gray-600">{data?.month || 'Loading...'}</p>
         </div>
@@ -146,56 +145,50 @@ export default function DashboardPage() {
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Link href={`/production`} className="cursor-pointer">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100 text-sm">Total Production</p>
-                    <p className="text-2xl font-bold">
-                      {totalActual.toLocaleString()}
-                    </p>
-                    <p className="text-blue-100 text-xs">
-                      Plan: {totalPlan.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="text-3xl opacity-80">📊</div>
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm">Total Production</p>
+                  <p className="text-2xl font-bold">
+                    {totalActual.toLocaleString()}
+                  </p>
+                  <p className="text-blue-100 text-xs">
+                    Plan: {totalPlan.toLocaleString()}
+                  </p>
                 </div>
+                <div className="text-3xl opacity-80">📊</div>
               </div>
-            </Link>
+            </div>
 
-            <Link href={`/fuel`} className="cursor-pointer">
-              <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100 text-sm">Achievement</p>
-                    <p className="text-2xl font-bold">
-                      {avgAchievement.toFixed(1)}%
-                    </p>
-                    <p className="text-green-100 text-xs">
-                      MTD: {latestData?.achMtd.toFixed(1)}%
-                    </p>
-                  </div>
-                  <div className="text-3xl opacity-80">🎯</div>
+            <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm">Achievement</p>
+                  <p className="text-2xl font-bold">
+                    {avgAchievement.toFixed(1)}%
+                  </p>
+                  <p className="text-green-100 text-xs">
+                    MTD: {latestData?.achMtd.toFixed(1)}%
+                  </p>
                 </div>
+                <div className="text-3xl opacity-80">🎯</div>
               </div>
-            </Link>
+            </div>
 
-            <Link href={`/fuel`} className="cursor-pointer">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-orange-100 text-sm">Total Fuel</p>
-                    <p className="text-2xl font-bold">
-                      {totalFuel.toLocaleString()}
-                    </p>
-                    <p className="text-orange-100 text-xs">
-                      FR: {latestData?.frMtd.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="text-3xl opacity-80">⛽</div>
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-100 text-sm">Total Fuel</p>
+                  <p className="text-2xl font-bold">
+                    {totalFuel.toLocaleString()}
+                  </p>
+                  <p className="text-orange-100 text-xs">
+                    FR: {latestData?.frMtd.toFixed(2)}
+                  </p>
                 </div>
+                <div className="text-3xl opacity-80">⛽</div>
               </div>
-            </Link>
+            </div>
 
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg shadow p-6">
               <div className="flex items-center justify-between">
